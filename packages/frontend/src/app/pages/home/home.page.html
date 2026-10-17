@@ -189,10 +189,10 @@
                     recipe.recipeLabels?.length &&
                     preferences[preferenceKeys.ShowLabels]
                   ) {
-                    <p [title]="getLabelList(recipe)">
-                      {{ "pages.home.recipe.labels" | translate }}
-                      {{ getLabelList(recipe) }}
-                    </p>
+                    <label-chips
+                      [title]="getLabelList(recipe)"
+                      [titles]="getLabelTitles(recipe)"
+                    ></label-chips>
                   }
                   @if (
                     recipe.rating && preferences[preferenceKeys.ShowRating]

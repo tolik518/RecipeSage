@@ -52,9 +52,7 @@
       @if (
         recipe.recipeLabels && recipe.recipeLabels.length > 0 && showLabels
       ) {
-        <p dir="auto">
-          {{ "pages.home.recipe.labels" | translate }} {{ labelList }}
-        </p>
+        <label-chips class="labels" [titles]="labelTitles"></label-chips>
       }
       @if (showRating && recipe.rating) {
         <rating [rating]="recipe.rating"></rating>

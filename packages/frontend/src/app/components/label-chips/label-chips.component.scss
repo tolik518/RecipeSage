@@ -1,0 +1,32 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+// One line; long labels shorten with "…" so card heights stay fixed
+.chips {
+  display: flex;
+  gap: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.chip {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  line-height: 1.05rem;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+
+  &.more {
+    flex-shrink: 0;
+    background: var(--ion-color-step-100, rgba(0, 0, 0, 0.08));
+    color: var(--ion-color-step-700, currentColor);
+  }
+}

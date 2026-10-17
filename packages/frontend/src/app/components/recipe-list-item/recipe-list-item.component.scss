@@ -135,6 +135,10 @@ ion-badge {
       color: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.8);
     }
 
+    label-chips.labels {
+      margin-top: 3px;
+    }
+
     rating {
       display: flex;
       align-items: center;

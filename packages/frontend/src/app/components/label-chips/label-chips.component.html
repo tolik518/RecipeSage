@@ -1,0 +1,12 @@
+<span
+  class="chips"
+  role="list"
+  [attr.aria-label]="('pages.home.recipe.labels' | translate) + ' ' + allTitles"
+>
+  @for (title of visibleTitles; track title) {
+    <span class="chip" role="listitem" dir="auto">{{ title }}</span>
+  }
+  @if (hiddenCount > 0) {
+    <span class="chip more" role="listitem">+{{ hiddenCount }}</span>
+  }
+</span>

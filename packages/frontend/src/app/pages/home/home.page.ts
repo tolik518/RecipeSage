@@ -35,6 +35,7 @@ import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { LogoIconComponent } from "../../components/logo-icon/logo-icon.component";
 import { NullStateComponent } from "../../components/null-state/null-state.component";
 import { RecipeListItemComponent } from "../../components/recipe-list-item/recipe-list-item.component";
+import { LabelChipsComponent } from "../../components/label-chips/label-chips.component";
 import { RatingComponent } from "../../components/rating/rating.component";
 import {
   IonHeader,
@@ -81,6 +82,7 @@ const MOBILE_TWO_COLUMN_MIN_WIDTH = 375;
     NullStateComponent,
     RecipeListItemComponent,
     RatingComponent,
+    LabelChipsComponent,
     UiScrollModule,
     IonHeader,
     IonToolbar,
@@ -935,6 +937,10 @@ export class HomePage implements OnDestroy {
       showLabels: this.preferences[this.preferenceKeys.ShowLabels],
       showRating: this.preferences[this.preferenceKeys.ShowRating],
     };
+  }
+
+  getLabelTitles(recipe: RecipeSummaryLite): string[] {
+    return recipe.recipeLabels.map((recipeLabel) => recipeLabel.label.title);
   }
 
   getLabelList(recipe: RecipeSummaryLite) {

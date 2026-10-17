@@ -3,13 +3,19 @@ import { IonBadge } from "@ionic/angular/standalone";
 import type { RecipeSummaryLite } from "@recipesage/prisma";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { RatingComponent } from "../rating/rating.component";
+import { LabelChipsComponent } from "../label-chips/label-chips.component";
 
 @Component({
   standalone: true,
   selector: "recipe-list-item",
   templateUrl: "./recipe-list-item.component.html",
   styleUrls: ["./recipe-list-item.component.scss"],
-  imports: [...SHARED_UI_IMPORTS, IonBadge, RatingComponent],
+  imports: [
+    ...SHARED_UI_IMPORTS,
+    IonBadge,
+    RatingComponent,
+    LabelChipsComponent,
+  ],
 })
 export class RecipeListItemComponent {
   @Input({ required: true }) recipe!: RecipeSummaryLite;
@@ -20,11 +26,10 @@ export class RecipeListItemComponent {
   @Input() showFromUser = false;
   @Input() showLabels = true;
 
-  /** "vegetarisch, ofen" */
-  get labelList(): string {
-    return this.recipe.recipeLabels
-      .map((recipeLabel) => recipeLabel.label.title)
-      .join(", ");
+  get labelTitles(): string[] {
+    return this.recipe.recipeLabels.map(
+      (recipeLabel) => recipeLabel.label.title,
+    );
   }
   @Input() showRating = false;
   @Input() selected = false;
