@@ -47,12 +47,12 @@ services:
     restart: unless-stopped
   static: # Hosts frontend assets
     container_name: recipesage_static
-    # Custom build of tolik518/RecipeSage feature/trello-shopping-list (v4.0.13 + Trello). See ./build.sh
+    # Custom build of tolik518/RecipeSage, branch dev (v4.0.13 + our changes). See ./build.sh
     image: recipesage-custom:static-v4.0.13-trello
     restart: unless-stopped
   api: # Hosts backend API
     container_name: recipesage_api
-    # Custom build of tolik518/RecipeSage feature/trello-shopping-list (v4.0.13 + Trello). See ./build.sh
+    # Custom build of tolik518/RecipeSage, branch dev (v4.0.13 + our changes). See ./build.sh
     image: recipesage-custom:api-v4.0.13-trello
     depends_on:
       postgres:
