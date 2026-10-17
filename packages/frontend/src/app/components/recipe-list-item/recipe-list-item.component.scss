@@ -26,7 +26,7 @@ ion-badge {
 
   position: relative;
   display: grid;
-  grid-template-columns: var(--image-size) auto;
+  grid-template-columns: var(--image-size) minmax(0, 1fr);
   height: calc(var(--image-size) + calc(var(--padding) * 2));
   overflow: hidden;
   padding-inline-start: 8px;
@@ -38,7 +38,7 @@ ion-badge {
 
   &.no-image {
     --image-size: 80px;
-    grid-template-columns: 0 auto;
+    grid-template-columns: 0 minmax(0, 1fr);
   }
 
   @media only screen and (min-width: $desktop-breakpoint) {
@@ -48,6 +48,11 @@ ion-badge {
   &.compact {
     --image-size: 38px;
     --padding: 2px;
+
+    .recipe-item-content h2 {
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
 
     .recipe-item-content .recipe-item-content-meta {
       display: flex;
@@ -81,8 +86,17 @@ ion-badge {
     margin-bottom: var(--padding);
     margin-top: var(--padding);
     object-fit: cover;
-    border-radius: 4px;
-    box-shadow: 1px 1px 7px rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+
+    // Recipes without a photo: small muted logo on a soft tint
+    &.placeholder {
+      object-fit: contain;
+      padding: calc(var(--image-size) * 0.26);
+      background: rgba(var(--ion-color-primary-rgb), 0.08);
+      box-shadow: none;
+      opacity: 0.65;
+    }
   }
 
   .recipe-item-content {
@@ -100,11 +114,16 @@ ion-badge {
       margin-top: 2px;
       margin-bottom: 2px;
       font-size: 1rem;
-      font-weight: normal;
+      font-weight: 600;
+      line-height: 1.3;
 
-      white-space: nowrap;
+      // Up to two lines, then "…"
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
       overflow: hidden;
-      text-overflow: ellipsis;
+      overflow-wrap: anywhere;
     }
 
     p {

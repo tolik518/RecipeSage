@@ -1,3 +1,10 @@
 ion-item {
   --background: var(--background);
 }
+
+// Item action buttons (options, delete): at least 44px to tap comfortably
+ion-button[slot="end"] {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+}

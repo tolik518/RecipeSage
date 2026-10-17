@@ -2,6 +2,14 @@
 // http://ionicframework.com/docs/theming/
 
 @mixin blackModeVars() {
+  --ion-color-nav: #000000;
+  --ion-color-nav-rgb: 0, 0, 0;
+  --ion-color-nav-contrast: #ffffff;
+  --ion-color-nav-contrast-rgb: 255, 255, 255;
+  --ion-color-nav-shade: #000000;
+  --ion-color-nav-tint: #121212;
+  --rs-toolbar-border-color: rgba(255, 255, 255, 0.12);
+
   --rs-match-color: var(--ion-color-primary);
   --rs-list-stripe-color: var(--ion-color-dark-shade);
   --ion-border-color: var(--ion-color-dark-shade);
@@ -47,6 +55,15 @@
 }
 
 @mixin darkModeVars() {
+  // Header bar blends into the dark background
+  --ion-color-nav: #1e1f22;
+  --ion-color-nav-rgb: 30, 31, 34;
+  --ion-color-nav-contrast: #ffffff;
+  --ion-color-nav-contrast-rgb: 255, 255, 255;
+  --ion-color-nav-shade: #1a1b1e;
+  --ion-color-nav-tint: #2a2b2e;
+  --rs-toolbar-border-color: rgba(255, 255, 255, 0.08);
+
   --rs-match-color: var(--ion-color-primary);
   --rs-list-stripe-color: #101010;
   --ion-border-color: #2c2c2c;
@@ -91,6 +108,9 @@
 }
 
 @mixin midnightModeVars() {
+  // Midnight keeps its navy header bar
+  --rs-toolbar-border-color: rgba(255, 255, 255, 0.08);
+
   --rs-match-color: var(--ion-color-primary);
   --rs-list-stripe-color: var(--ion-color-dark-shade);
   --ion-border-color: var(--ion-color-dark-shade);
@@ -127,6 +147,22 @@
 }
 
 @mixin lightModeVars() {
+  // Deeper blue than the shared #00a8ff: 4.5:1 on white, so links and
+  // button labels stay readable (#00a8ff is only 2.6:1).
+  --ion-color-primary: #0b7bc4;
+  --ion-color-primary-rgb: 11, 123, 196;
+  --ion-color-primary-shade: #0a6cac;
+  --ion-color-primary-tint: #2388ca;
+
+  // Light header bar instead of the dark slate one
+  --ion-color-nav: #ffffff;
+  --ion-color-nav-rgb: 255, 255, 255;
+  --ion-color-nav-contrast: #1d1f23;
+  --ion-color-nav-contrast-rgb: 29, 31, 35;
+  --ion-color-nav-shade: #f2f2f4;
+  --ion-color-nav-tint: #ffffff;
+  --rs-toolbar-border-color: rgba(0, 0, 0, 0.08);
+
   --rs-match-color: #0077b8;
   --rs-list-stripe-color: #f4f4f4;
   --ion-border-color: rgba(0, 0, 0, 0.13);

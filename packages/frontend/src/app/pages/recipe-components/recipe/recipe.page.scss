@@ -31,7 +31,10 @@ ion-thumbnail {
 }
 
 h2.recipeTitle {
-  font-size: 1.125rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
   margin-top: 0 !important;
 }
 
@@ -160,8 +163,10 @@ h2.recipeTitle {
 }
 
 .meta {
-  border-top: 1px solid var(--ion-border-color);
-  border-bottom: 1px solid var(--ion-border-color);
+  // Soft card instead of two divider lines
+  background: var(--ion-color-step-50, rgba(0, 0, 0, 0.04));
+  border-radius: 14px;
+  padding: 6px 8px;
   margin-top: 15px;
   margin-bottom: 15px;
 
@@ -254,5 +259,91 @@ h2.recipeTitle {
 
   &.inlineImage--xlarge figcaption {
     max-width: 840px;
+  }
+}
+
+// --- Readable while cooking ----------------------------------------------
+// Section headings: bold text, smaller accent-coloured icon
+ion-item:has(> ion-label.section-title) ion-icon {
+  font-size: 22px;
+  color: var(--ion-color-primary);
+}
+
+ion-label.section-title p {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--ion-text-color);
+}
+
+.ingredients .ingredient,
+.instructions .instruction {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--ion-text-color);
+}
+
+.ingredients .ingredient.header,
+.instructions .sectionHeader {
+  font-weight: 600;
+}
+
+// --- Actions ----------------------------------------------------------------
+.action-buttons ion-button {
+  min-height: 44px;
+}
+
+.recipe-action-bar {
+  ion-toolbar {
+    --background: var(--ion-color-nav);
+    --border-color: var(--rs-toolbar-border-color, transparent);
+    --border-width: 1px 0 0 0;
+    --border-style: solid;
+    --padding-top: 0;
+    --padding-bottom: 0;
+  }
+
+  .recipe-action-bar__buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    min-height: 56px;
+    padding: 6px 2px;
+    background: none;
+    color: var(--ion-color-nav-contrast, var(--ion-text-color));
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    ion-icon {
+      font-size: 24px;
+      color: var(--ion-color-primary);
+    }
+
+    &:active {
+      opacity: 0.6;
+    }
+  }
+}
+
+// Phones: the action bar replaces the button rows at the bottom of the page
+// (one pixel below the breakpoint, so exactly one of the two is always shown)
+@media only screen and (max-width: ($desktop-breakpoint - 1px)) {
+  .action-buttons {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: $desktop-breakpoint) {
+  .recipe-action-bar {
+    display: none;
   }
 }

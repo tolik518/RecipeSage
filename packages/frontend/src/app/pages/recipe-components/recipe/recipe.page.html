@@ -966,3 +966,35 @@
     </div>
   }
 </ion-content>
+
+@if (recipe && isLoggedIn && recipe.folder === "main") {
+  <!-- Phones: the most used actions, always within thumb reach (hidden on wider screens) -->
+  <ion-footer class="recipe-action-bar">
+    <ion-toolbar>
+      <div class="recipe-action-bar__buttons">
+        <button type="button" (click)="addRecipeToShoppingList()">
+          <ion-icon name="list-outline" aria-hidden="true"></ion-icon>
+          <span>{{
+            "pages.recipeDetails.actionBar.shoppingList" | translate
+          }}</span>
+        </button>
+        <button type="button" (click)="addRecipeToMealPlan()">
+          <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
+          <span>{{
+            "pages.recipeDetails.actionBar.mealPlan" | translate
+          }}</span>
+        </button>
+        <button type="button" (click)="enterCookMode()">
+          <ion-icon name="restaurant-outline" aria-hidden="true"></ion-icon>
+          <span>{{
+            "pages.recipeDetails.actionBar.cookMode" | translate
+          }}</span>
+        </button>
+        <button type="button" (click)="presentPopover($event)">
+          <ion-icon name="ellipsis-horizontal" aria-hidden="true"></ion-icon>
+          <span>{{ "pages.recipeDetails.actionBar.more" | translate }}</span>
+        </button>
+      </div>
+    </ion-toolbar>
+  </ion-footer>
+}

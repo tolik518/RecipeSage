@@ -38,3 +38,42 @@ ion-fab[vertical="bottom"] {
 ion-fab[vertical="top"] {
   margin-top: var(--ion-safe-area-top, 0);
 }
+
+// --- Modern refresh -----------------------------------------------------
+// Light header bars need a hairline to separate them from the content.
+ion-header ion-toolbar.ion-color-nav {
+  --border-color: var(--rs-toolbar-border-color, transparent);
+  --border-width: 0 0 1px 0;
+  --border-style: solid;
+}
+
+ion-header.header-md {
+  box-shadow: none;
+}
+
+ion-toolbar.ion-color-nav ion-title {
+  font-weight: 600;
+}
+
+// Rounder controls
+ion-button:not(.button-clear):not([shape="round"]) {
+  --border-radius: 12px;
+}
+
+ion-searchbar {
+  --border-radius: 12px;
+}
+
+ion-card {
+  border-radius: 16px;
+}
+
+ion-chip {
+  border-radius: 999px;
+}
+
+// Sentence-case buttons on Android too (Material defaults to ALL CAPS)
+.md ion-button {
+  text-transform: none;
+  letter-spacing: normal;
+}

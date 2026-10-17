@@ -1,3 +1,14 @@
+.page-wrapper {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 16px;
+}
+
+info-block {
+  display: block;
+  margin-bottom: 16px;
+}
+
 .connected {
   display: flex;
   align-items: center;

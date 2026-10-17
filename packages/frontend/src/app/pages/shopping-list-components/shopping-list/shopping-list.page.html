@@ -5,10 +5,7 @@
     </ion-buttons>
 
     <ion-title>
-      {{
-        "pages.shoppingList.title"
-          | translate: { title: shoppingList()?.title || "" }
-      }}
+      {{ shoppingList()?.title || ("pages.shoppingLists.title" | translate) }}
     </ion-title>
 
     <ion-buttons slot="end">

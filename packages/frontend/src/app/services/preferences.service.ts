@@ -81,7 +81,11 @@ export class PreferencesService {
     [MealPlanPreferenceKey.ShowAddedBy]: false,
     [MealPlanPreferenceKey.ShowAddedOn]: false,
     [MealPlanPreferenceKey.StartOfWeek]: MealPlanStartOfWeekOptions.Monday,
-    [MealPlanPreferenceKey.ViewType]: MealPlanViewTypeOptions.Calendar,
+    // List on small screens, where the month calendar's day cells are too small to tap
+    [MealPlanPreferenceKey.ViewType]:
+      Math.min(window.innerWidth, window.innerHeight) < 440
+        ? MealPlanViewTypeOptions.List
+        : MealPlanViewTypeOptions.Calendar,
 
     [ShoppingListPreferenceKey.SortBy]: ShoppingListSortOptions.CreatedAtDesc,
     [ShoppingListPreferenceKey.ShowAddedBy]: false,
