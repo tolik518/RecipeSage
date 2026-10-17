@@ -1,0 +1,11 @@
+# The dashboards in ops/grafana/dashboards, read-only: change the JSON in
+# the repository, not in Grafana.
+apiVersion: 1
+providers:
+  - name: recipesage
+    folder: recipesage
+    type: file
+    disableDeletion: true
+    allowUiUpdates: false
+    options:
+      path: /etc/grafana/dashboards-recipesage

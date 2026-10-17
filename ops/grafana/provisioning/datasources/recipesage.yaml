@@ -1,0 +1,18 @@
+# Read-only Postgres data source for the RecipeSage dashboard.
+# Mounted into the shared Grafana. Password comes from the RECIPESAGE_DB_PASSWORD
+# env var (set via grafana/.env), not stored here. Edit the repo, not the UI.
+apiVersion: 1
+datasources:
+  - name: RecipeSage
+    type: grafana-postgresql-datasource
+    uid: recipesage-postgres
+    url: recipesage-postgres:5432
+    user: grafana_ro
+    jsonData:
+      database: recipesage_selfhost
+      sslmode: disable
+      postgresVersion: 1600
+    secureJsonData:
+      password: $RECIPESAGE_DB_PASSWORD
+    isDefault: false
+    editable: false

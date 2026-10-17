@@ -1,0 +1,144 @@
+# RecipeSage (self-hosted) — https://github.com/julianpoy/recipesage-selfhost
+# Based on recipesage-selfhost config version 2026-08-16, RecipeSage version 4.0.13.
+# Fronted by host nginx at https://rezepte.r0.fyi -> 127.0.0.1:7270 (the `proxy` container).
+
+x-common-env: &common-env
+  # Public base URL for this instance. Keep the "/api" suffix.
+  API_PUBLIC_BASE_URL: https://rezepte.r0.fyi/api
+
+  # Pushpin is only reachable inside this stack's network, so the default key is fine.
+  GRIP_KEY: recipesage_selfhost
+  # Postgres credentials. POSTGRES_PASSWORD comes from .env (gitignored); see .env.example.
+  POSTGRES_DB: recipesage_selfhost
+  POSTGRES_USER: recipesage_selfhost
+  POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in recipesage/.env}
+  DATABASE_URL: postgresql://recipesage_selfhost:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in recipesage/.env}@postgres:5432/recipesage_selfhost
+  # Uses RecipeSage cloud by default; uncomment the grocery-categorizer service to run locally.
+  GROCERY_CATEGORIZER_URL: https://grocery-categorizer.recipesage.com/
+  # Optional AI features (clip-from-URL, OCR, assistant). Leave AI_API_KEY blank to disable.
+  AI_PROVIDER: "openrouter"
+  AI_API_KEY: ""
+  AI_API_BASE_URL: ""
+  AI_MODEL_WEBPAGE: google/gemini-2.5-flash-lite
+  AI_MODEL_TEXT: google/gemini-2.5-flash-lite
+  AI_MODEL_OCR: google/gemini-2.5-flash
+  AI_MODEL_DOCUMENT: google/gemini-2.5-flash
+  AI_MODEL_MODERATION: google/gemini-2.5-flash
+  AI_MODEL_VISION: anthropic/claude-sonnet-4.6
+  AI_MODEL_NUTRITION: google/gemini-2.5-flash-lite
+  AI_MODEL_ASSISTANT: anthropic/claude-sonnet-4.6
+  AI_MODEL_ASSISTANT_LOW: google/gemini-2.5-flash
+  SCRAPFLY_API_KEY: ""
+
+# === Please do not change any values below this line ===
+
+services:
+  proxy: # Entry point for the stack; host nginx proxies rezepte.r0.fyi here.
+    container_name: recipesage_proxy
+    image: julianpoy/recipesage-selfhost-proxy:2026-08-16
+    ports:
+      - "127.0.0.1:7270:80"
+    depends_on:
+      - static
+      - api
+      - pushpin
+    restart: unless-stopped
+  static: # Hosts frontend assets
+    container_name: recipesage_static
+    image: julianpoy/recipesage-selfhost:static-v4.0.13
+    restart: unless-stopped
+  api: # Hosts backend API
+    container_name: recipesage_api
+    image: julianpoy/recipesage-selfhost:api-v4.0.13
+    depends_on:
+      postgres:
+        condition: service_healthy
+      pushpin:
+        condition: service_started
+      valkey:
+        condition: service_started
+    command: ./scripts/selfhost-startup.sh
+    environment:
+      <<: *common-env
+      # Registration is closed by default. ./add-user.sh flips this to false just
+      # long enough to create one account, then recreates api back to "true".
+      DISABLE_REGISTRATION: "${RS_DISABLE_REGISTRATION:-true}"
+      ENVIRONMENT: selfhost
+      NODE_ENV: selfhost
+      NODE_OPTIONS: "--max-old-space-size=400"
+      MALLOC_ARENA_MAX: "2"
+      FILESYSTEM_STORAGE_PATH: /rs-media
+      STORAGE_TYPE: filesystem
+      VERBOSE: "false"
+      VERSION: selfhost
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_SSL: "false"
+      POSTGRES_LOGGING: "false"
+      DATABASE_SSL: "false"
+      GRIP_URL: http://pushpin:5561/
+      JOB_QUEUE_REDIS_HOST: valkey
+      STRIPE_SK: ""
+      GCM_KEYPAIR: ""
+      SENTRY_DSN: ""
+      STRIPE_WEBHOOK_SECRET: ""
+    volumes:
+      - apimedia:/rs-media
+    restart: unless-stopped
+  pushpin: # Provides websocket support
+    container_name: recipesage_pushpin
+    image: julianpoy/pushpin:2023-09-17
+    entrypoint: /bin/sh -c
+    command:
+      [
+        'sed -i "s/sig_key=changeme/sig_key=$$GRIP_KEY/" /etc/pushpin/pushpin.conf && echo "* $${TARGET},over_http" > /etc/pushpin/routes && pushpin --merge-output',
+      ]
+    environment:
+      <<: *common-env
+      TARGET: api:3000
+    restart: unless-stopped
+  postgres: # Database
+    container_name: recipesage_postgres
+    image: postgres:16
+    environment:
+      <<: *common-env
+    volumes:
+      - postgresdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      # Stays on the stack's default network for the app, and also joins the shared
+      # service-network so the host Grafana can query it (read-only) at recipesage-postgres:5432.
+      default: {}
+      service-network:
+        aliases:
+          - recipesage-postgres
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "recipesage_selfhost", "-U", "recipesage_selfhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+  valkey:
+    restart: unless-stopped
+    image: valkey/valkey
+
+  # ===
+  # Grocery Categorizer (optional, resource-intensive, needs AVX CPU support).
+  # If enabled, set GROCERY_CATEGORIZER_URL above to http://grocery-categorizer:8000/
+  # ===
+  # grocery-categorizer:
+  #   container_name: recipesage_grocery_categorizer
+  #   image: julianpoy/grocery-categorizer:f9d9562
+  #   restart: unless-stopped
+
+volumes:
+  apimedia:
+    driver: local
+  postgresdata:
+    driver: local
+
+networks:
+  # The stack's own network is the implicit `default`; service-network is the shared
+  # external network (see repo CLAUDE.md) used only so Grafana can reach postgres.
+  service-network:
+    external: true

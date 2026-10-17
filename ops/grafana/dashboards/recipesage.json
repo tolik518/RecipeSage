@@ -1,0 +1,127 @@
+{
+  "annotations": { "list": [] },
+  "editable": false,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "id": 1,
+      "type": "row",
+      "title": "Totals",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 0 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Users",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"Users\" FROM \"Users\"" } ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "Recipes",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 4, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"Recipes\" FROM \"Recipes\"" } ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "Images",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 8, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "purple" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"Images\" FROM \"Images\"" } ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "Labels",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 12, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "orange" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"Labels\" FROM \"Labels\"" } ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "Meal Plans",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 16, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "red" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"MealPlans\" FROM \"MealPlans\"" } ]
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "Shopping Lists",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 4, "w": 4, "x": 20, "y": 1 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "yellow" }, "unit": "short" }, "overrides": [] },
+      "options": { "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false }, "orientation": "auto", "textMode": "value", "colorMode": "value", "graphMode": "none", "justifyMode": "auto" },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT count(*) AS \"ShoppingLists\" FROM \"ShoppingLists\"" } ]
+    },
+    {
+      "id": 8,
+      "type": "row",
+      "title": "Growth",
+      "gridPos": { "h": 1, "w": 24, "x": 0, "y": 5 },
+      "collapsed": false,
+      "panels": []
+    },
+    {
+      "id": 9,
+      "type": "timeseries",
+      "title": "New users per day",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "blue" }, "custom": { "drawStyle": "bars", "fillOpacity": 60, "lineWidth": 1, "stacking": { "mode": "none" } }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "showLegend": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "time_series", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT $__timeGroupAlias(\"createdAt\", '1d', 0), count(*) AS \"users\" FROM \"Users\" WHERE $__timeFilter(\"createdAt\") GROUP BY 1 ORDER BY 1" } ]
+    },
+    {
+      "id": 10,
+      "type": "timeseries",
+      "title": "New recipes per day",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "fieldConfig": { "defaults": { "color": { "mode": "fixed", "fixedColor": "green" }, "custom": { "drawStyle": "bars", "fillOpacity": 60, "lineWidth": 1, "stacking": { "mode": "none" } }, "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "showLegend": false }, "tooltip": { "mode": "single", "sort": "none" } },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "time_series", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT $__timeGroupAlias(\"createdAt\", '1d', 0), count(*) AS \"recipes\" FROM \"Recipes\" WHERE $__timeFilter(\"createdAt\") GROUP BY 1 ORDER BY 1" } ]
+    },
+    {
+      "id": 11,
+      "type": "table",
+      "title": "Recipes per user",
+      "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" },
+      "gridPos": { "h": 9, "w": 24, "x": 0, "y": 14 },
+      "fieldConfig": { "defaults": { "custom": { "align": "auto" } }, "overrides": [] },
+      "options": { "showHeader": true, "sortBy": [ { "displayName": "recipes", "desc": true } ] },
+      "targets": [ { "refId": "A", "datasource": { "type": "grafana-postgresql-datasource", "uid": "recipesage-postgres" }, "format": "table", "editorMode": "code", "rawQuery": true, "rawSql": "SELECT u.name AS \"user\", u.email AS \"email\", count(r.id) AS \"recipes\" FROM \"Users\" u LEFT JOIN \"Recipes\" r ON r.\"userId\" = u.id GROUP BY u.name, u.email ORDER BY 3 DESC" } ]
+    }
+  ],
+  "refresh": "5m",
+  "schemaVersion": 41,
+  "tags": ["recipesage"],
+  "templating": { "list": [] },
+  "time": { "from": "now-1y", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "recipesage",
+  "uid": "recipesage",
+  "version": 1,
+  "weekStart": ""
+}
