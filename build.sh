@@ -5,6 +5,7 @@
 #
 # Usage: ./build.sh [tag]            (default tag: v4.0.13-trello)
 #   APP_SRC=/path/to/RecipeSage ./build.sh
+#   BUILD=static ./build.sh            (only the frontend image; also: BUILD=api)
 #
 # Produces:
 #   recipesage-custom:api-<tag>
@@ -16,19 +17,23 @@ cd "$(dirname "$0")"
 TAG="${1:-v4.0.13-trello}"
 APP_SRC="$(cd "${APP_SRC:-../recipesage-app}" && pwd)"
 NODE_IMAGE="node:24.13-alpine"
+BUILD="${BUILD:-api static}"
 
 echo "==> Source: $APP_SRC ($(git -C "$APP_SRC" rev-parse --abbrev-ref HEAD) @ $(git -C "$APP_SRC" rev-parse --short HEAD))"
 if [[ -n "$(git -C "$APP_SRC" status --porcelain)" ]]; then
   echo "    WARNING: source tree has uncommitted changes; they will be built in." >&2
 fi
 
+if [[ " $BUILD " == *" api "* ]]; then
 echo "==> Building api image recipesage-custom:api-$TAG"
 docker build \
   --build-arg VERSION="$TAG" \
   -f "$APP_SRC/production.Dockerfile" \
   -t "recipesage-custom:api-$TAG" \
   "$APP_SRC"
+fi
 
+if [[ " $BUILD " == *" static "* ]]; then
 echo "==> Building frontend (nx build:selfhost) in $NODE_IMAGE"
 docker run --rm \
   -v "$APP_SRC":/app \
@@ -56,6 +61,7 @@ cp "$APP_SRC/packages/frontend/selfhost.Dockerfile" "$STATIC_CTX/Dockerfile"
 
 echo "==> Building static image recipesage-custom:static-$TAG"
 docker build -t "recipesage-custom:static-$TAG" "$STATIC_CTX"
+fi
 
 echo "==> Done:"
 docker image ls --filter "reference=recipesage-custom:*-$TAG" --format '    {{.Repository}}:{{.Tag}}  {{.Size}}'
