@@ -25,13 +25,13 @@
   background: rgba(var(--ion-color-primary-rgb), 0.1);
   color: var(--ion-color-primary);
 
-  // Shorten later chips first, so the first label stays readable
-  & + .chip {
-    flex-shrink: 4;
+  // The first label and "+N" keep their width; the labels in between shorten
+  &:first-child,
+  &.more {
+    flex-shrink: 0;
   }
 
   &.more {
-    flex-shrink: 0;
     background: var(--ion-color-step-100, rgba(0, 0, 0, 0.08));
     color: var(--ion-color-step-700, currentColor);
   }
