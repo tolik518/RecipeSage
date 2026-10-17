@@ -24,6 +24,25 @@ describe("getMyCapabilities", () => {
       expect(response.multipleImages).toEqual(true);
     });
 
+    test("grants high-res images (only) on self-hosted instances", async ({
+      trpc,
+    }) => {
+      vi.stubEnv("NODE_ENV", "selfhost");
+      try {
+        const response = await trpc.users.getMyCapabilities();
+
+        expect(response).toEqual({
+          highResImages: true,
+          multipleImages: false,
+          expandablePreviews: false,
+          assistantMoreMessages: false,
+          moreUsageCredits: false,
+        });
+      } finally {
+        vi.unstubAllEnvs();
+      }
+    });
+
     test("returns all capabilities disabled when not logged in", async () => {
       const response = await anonymousTrpc.users.getMyCapabilities();
 

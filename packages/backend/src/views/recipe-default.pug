@@ -444,7 +444,7 @@ html(lang=language, dir=direction)
                   span
                   b !{instruction.htmlContent}
                 else
-                  b(class='count')= instruction.count
+                  b(class='count')= instruction.count + '.'
                   span !{instruction.htmlContent}
 
     if recipe.notes.length && !modifiers.hideNotes

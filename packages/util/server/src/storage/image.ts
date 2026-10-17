@@ -15,7 +15,8 @@ import type { FitEnum } from "sharp";
 
 const HIGH_RES_IMG_CONVERSION_WIDTH = 1024;
 const HIGH_RES_IMG_CONVERSION_HEIGHT = 1024;
-const HIGH_RES_IMG_CONVERSION_QUALITY = 55;
+// 55 left visible JPEG artifacts on recipe photos
+const HIGH_RES_IMG_CONVERSION_QUALITY = 82;
 
 const LOW_RES_IMG_CONVERSION_WIDTH = 200;
 const LOW_RES_IMG_CONVERSION_HEIGHT = 200;

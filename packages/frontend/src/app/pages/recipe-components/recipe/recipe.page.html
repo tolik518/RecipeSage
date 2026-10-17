@@ -17,16 +17,22 @@
 <ion-content class="ion-padding">
   @if (recipe) {
     <div class="page-wrapper">
+      @if (recipe.recipeImages.length) {
+        <button
+          type="button"
+          class="recipe-hero"
+          [attr.aria-label]="recipe.title"
+          (click)="openImageViewer()"
+        >
+          <img [cachedSrc]="sortedRecipeImages()[0].image.location" alt="" />
+          @if (recipe.recipeImages.length > 1) {
+            <span class="recipe-hero__count"
+              >1/{{ recipe.recipeImages.length }}</span
+            >
+          }
+        </button>
+      }
       <ion-item lines="none">
-        @if (recipe.recipeImages.length) {
-          <ion-thumbnail
-            class="ion-margin-top"
-            slot="start"
-            (click)="openImageViewer()"
-          >
-            <img [cachedSrc]="sortedRecipeImages()[0].image.location" />
-          </ion-thumbnail>
-        }
         <ion-label dir="auto">
           <h2 class="recipeTitle ion-text-wrap">{{ recipe.title }}</h2>
           @if (
@@ -254,7 +260,7 @@
                       }"
                       dir="auto"
                     >
-                      <b>{{ instruction.count }} &nbsp;</b>
+                      <b>{{ instruction.count }}.&nbsp;</b>
                       <span
                         class="instructionContent"
                         [innerHTML]="instruction.htmlContent"
