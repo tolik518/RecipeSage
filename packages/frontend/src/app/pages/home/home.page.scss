@@ -210,3 +210,9 @@ ion-badge {
     }
   }
 }
+
+// Full-height tap area for the "Filter" button next to the search field
+ion-button.search-filter {
+  min-height: 44px;
+  margin: 0;
+}

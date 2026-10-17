@@ -20,6 +20,57 @@ ion-menu.cookingToolbarOpen {
   height: calc(100% - 60px);
 }
 
+// Bottom tab bar (phones): the page area ends where the bar starts
+ion-router-outlet.tabBarOpen {
+  height: calc(100% - var(--rs-tab-bar-height));
+}
+
+ion-router-outlet.tabBarOpen.cookingToolbarOpen {
+  height: calc(100% - 60px - var(--rs-tab-bar-height));
+}
+
+.app-tab-bar {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  z-index: 10;
+  height: var(--rs-tab-bar-height);
+  padding-bottom: var(--ion-safe-area-bottom, 0px);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--ion-color-nav);
+  border-top: 1px solid var(--rs-toolbar-border-color, var(--ion-border-color));
+
+  button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 2px;
+    background: none;
+    color: var(--ion-color-medium);
+    font: inherit;
+    font-size: 0.72rem;
+    font-weight: 500;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+
+    ion-icon {
+      font-size: 24px;
+    }
+
+    &.active {
+      color: var(--ion-color-primary);
+      font-weight: 600;
+    }
+
+    &:active {
+      opacity: 0.6;
+    }
+  }
+}
+
 .ion-checkbox-label,
 .ion-radio-label {
   line-height: 24px;

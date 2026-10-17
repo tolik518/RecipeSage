@@ -144,6 +144,15 @@ export class AddRecipeToShoppingListModalPage {
     this.destinationShoppingList = this.shoppingLists.find(
       (el) => el.id === lastUsedShoppingListId,
     );
+    if (this.destinationShoppingList) return;
+
+    // Nothing remembered: preselect when there is only one place to add to
+    // (same rule as the meal plan modal)
+    if (this.shoppingLists.length === 1 && !this.trelloCardName) {
+      this.destinationShoppingList = this.shoppingLists[0];
+    } else if (this.shoppingLists.length === 0 && this.trelloCardName) {
+      this.destinationShoppingList = TRELLO_DESTINATION;
+    }
   }
 
   saveLastUsedShoppingList() {

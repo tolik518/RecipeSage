@@ -28,6 +28,8 @@ import {
   getMealSortOrder,
   getMealColors,
   DEFAULT_MEAL_COLORS,
+  DEFAULT_MEAL_I18N,
+  getMealDisplayNames,
 } from "@recipesage/util/shared";
 import type { MealPlanItemDraft } from "../new-meal-plan-item-modal/new-meal-plan-item-modal.page";
 
@@ -982,6 +984,16 @@ export class MealPlanPage {
     this.loadWithProgress();
   }
 
+  /** Translated name of a meal slot ("Abendessen"), or the custom meal's name */
+  getMealLabel(meal: string): string {
+    const i18nKey = DEFAULT_MEAL_I18N[meal];
+    if (i18nKey) return this.translate.instant(i18nKey);
+    const displayNames = getMealDisplayNames(
+      this.mealPlan()?.customMealOptions ?? null,
+    );
+    return displayNames[meal.toLowerCase()] || meal;
+  }
+
   getMealBorderColor(meal: string): string {
     return (
       this.mealColors[meal.toLowerCase()] ||
@@ -1059,7 +1071,10 @@ export class MealPlanPage {
         dateStr,
         this.mealsByDate[d.year()]?.[d.month() + 1]?.[d.date()]?.items || [],
       );
-      this.listFormattedDates.set(dateStr, d.format("MMMM D, YYYY"));
+      this.listFormattedDates.set(
+        dateStr,
+        this.utilService.formatDayHeading(d.toDate()),
+      );
     }
 
     this.pastEntries = this.buildPastEntries();

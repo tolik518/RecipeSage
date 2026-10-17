@@ -1,0 +1,43 @@
+// Bottom sheet on phones: rows like a native action sheet instead of stacked
+// filled buttons; the destructive action stays red.
+:host(.sheet) {
+  overflow-y: auto;
+  max-height: 85vh;
+  padding-bottom: var(--ion-safe-area-bottom, 0);
+
+  ion-list {
+    background: transparent;
+    padding-top: 4px;
+  }
+
+  ion-list-header {
+    min-height: 34px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--ion-color-medium);
+  }
+
+  ion-button {
+    margin: 0 !important;
+    height: auto;
+    border-top: 1px solid var(--ion-border-color);
+    font-size: 1rem;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: normal;
+
+    &::part(native) {
+      min-height: 52px;
+      background: transparent;
+      color: var(--ion-color-primary);
+      box-shadow: none;
+      border-radius: 0;
+    }
+  }
+
+  ion-button[color="danger"]::part(native) {
+    color: var(--ion-color-danger);
+  }
+}

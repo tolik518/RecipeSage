@@ -1,5 +1,5 @@
-import { Component, Input, inject } from "@angular/core";
-import { PopoverController } from "@ionic/angular/standalone";
+import { Component, HostBinding, Input, inject } from "@angular/core";
+import { ModalController, PopoverController } from "@ionic/angular/standalone";
 import { PreferencesService } from "../../../services/preferences.service";
 import { RecipeDetailsPreferenceKey } from "@recipesage/util/shared";
 import { WakeLockService } from "../../../services/wakelock.service";
@@ -74,6 +74,15 @@ export class RecipeDetailsPopoverPage {
   cookingToolbarService = inject(CookingToolbarService);
   private featureFlagService = inject(FeatureFlagService);
   private popoverCtrl = inject(PopoverController);
+  private modalCtrl = inject(ModalController);
+
+  /** "sheet" on phones (bottom sheet modal), "popover" elsewhere */
+  @Input() presentation: "popover" | "sheet" = "popover";
+
+  @HostBinding("class.sheet")
+  get isSheet() {
+    return this.presentation === "sheet";
+  }
 
   @Input({
     required: true,
@@ -118,8 +127,11 @@ export class RecipeDetailsPopoverPage {
   }
 
   closeWithAction(name: RecipeDetailsPopoverActionTypes) {
-    this.popoverCtrl.dismiss({
-      action: name,
-    });
+    const data = { action: name };
+    if (this.presentation === "sheet") {
+      this.modalCtrl.dismiss(data);
+    } else {
+      this.popoverCtrl.dismiss(data);
+    }
   }
 }

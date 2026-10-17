@@ -373,19 +373,31 @@ export class RecipePage {
   async presentPopover(event: Event) {
     if (!this.recipe) return;
 
-    const popover = await this.popoverCtrl.create({
-      component: RecipeDetailsPopoverPage,
-      componentProps: {
-        recipe: this.recipe,
-        me: this.me(),
-        isLoggedIn: this.isLoggedIn,
-      },
-      event,
-    });
+    const componentProps = {
+      recipe: this.recipe,
+      me: this.me(),
+      isLoggedIn: this.isLoggedIn,
+    };
+    // Phones: a bottom sheet sized to its content; wider screens: a popover
+    const isPhone = window.matchMedia("(max-width: 640px)").matches;
+    const overlay = isPhone
+      ? await this.modalCtrl.create({
+          component: RecipeDetailsPopoverPage,
+          componentProps: { ...componentProps, presentation: "sheet" },
+          breakpoints: [0, 1],
+          initialBreakpoint: 1,
+          handle: true,
+          cssClass: "rs-auto-sheet",
+        })
+      : await this.popoverCtrl.create({
+          component: RecipeDetailsPopoverPage,
+          componentProps,
+          event,
+        });
 
-    await popover.present();
+    await overlay.present();
 
-    const { data } = await popover.onWillDismiss();
+    const { data } = await overlay.onWillDismiss();
     if (!data || !data.action) return;
     const action = data.action as RecipeDetailsPopoverActionTypes;
     switch (action) {

@@ -77,3 +77,26 @@ ion-chip {
   text-transform: none;
   letter-spacing: normal;
 }
+
+// Bottom sheets that size themselves to their content (e.g. the recipe "Mehr" sheet)
+ion-modal.rs-auto-sheet {
+  --height: auto;
+  --border-radius: 16px;
+}
+
+// Leave room at the end of the list so the last item can scroll clear of a
+// floating "+" button
+ion-content:has(> ion-fab[vertical="bottom"]) {
+  --padding-bottom: 88px;
+}
+
+// The search field shows Ionic's clear button; hide the browser's own one
+ion-searchbar input::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  display: none;
+}
+
+// Height of the bottom tab bar on phones (plus the iPhone home-indicator area)
+:root {
+  --rs-tab-bar-height: calc(56px + var(--ion-safe-area-bottom, 0px));
+}

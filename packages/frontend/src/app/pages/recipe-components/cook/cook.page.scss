@@ -1,3 +1,5 @@
+@import "../../../../theme/shared-variables.scss";
+
 .cook-wrapper {
   max-width: 1250px;
   margin: 0 auto;
@@ -118,5 +120,21 @@
     font-style: italic;
     margin-top: 4px;
     max-width: 320px;
+  }
+}
+
+.scale-short {
+  font-weight: 600;
+}
+
+@media only screen and (max-width: ($desktop-breakpoint - 1px)) {
+  .scale-long {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: $desktop-breakpoint) {
+  .scale-short {
+    display: none;
   }
 }

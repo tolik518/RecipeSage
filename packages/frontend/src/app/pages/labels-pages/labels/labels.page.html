@@ -20,7 +20,7 @@
       </ion-title>
     }
     @if (!selectionMode) {
-      <ion-title> {{ "pages.labels.title" | translate }} </ion-title>
+      <ion-title> {{ "pages.app.nav.labels" | translate }} </ion-title>
     }
 
     <ion-buttons slot="end">
@@ -145,12 +145,17 @@
             </ion-label>
             <ion-button
               slot="end"
+              fill="clear"
+              class="label-action"
+              [attr.aria-label]="'pages.recipeDetails.edit' | translate"
               (click)="$event.stopPropagation(); manageLabel(label)"
             >
               <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
             </ion-button>
             <ion-button
               slot="end"
+              fill="clear"
+              class="label-action"
               (click)="$event.stopPropagation(); browseLabelRecipes(label)"
             >
               <ion-icon name="folder-open-outline" slot="icon-only"></ion-icon>

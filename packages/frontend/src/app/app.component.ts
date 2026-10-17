@@ -84,6 +84,7 @@ import {
   helpBuoyOutline,
   leafOutline,
   logInOutline,
+  menuOutline,
   peopleOutline,
   pricetagOutline,
   settingsOutline,
@@ -154,6 +155,11 @@ export class AppComponent {
   isSelfHost = IS_SELFHOST;
   isLoggedIn?: boolean;
   inCookMode = false;
+
+  // Bottom tab bar (phones, logged in, main pages only)
+  showTabBar = false;
+  activeTab: "recipes" | "shopping" | "meals" | "more" | null = null;
+  private phoneQuery = window.matchMedia("(max-width: 640px)");
   menuSwipeEnabled = true;
 
   // See https://bugzilla.mozilla.org/show_bug.cgi?id=1811099
@@ -182,9 +188,13 @@ export class AppComponent {
   preferenceKeys = GlobalPreferenceKey;
 
   constructor() {
+    this.phoneQuery.addEventListener("change", () =>
+      this.ngZone.run(() => this.updateTabBar()),
+    );
     addIcons({
       addOutline,
       bookOutline,
+      menuOutline,
       calendarOutline,
       cartOutline,
       cloudDownloadOutline,
@@ -685,6 +695,7 @@ export class AppComponent {
       this.updateNavList();
 
       this.inCookMode = event.url.split("?")[0].endsWith("/cook");
+      this.updateTabBar(event.urlAfterRedirects);
 
       this.checkBrowserCompatibility();
 
@@ -741,6 +752,36 @@ export class AppComponent {
       });
     } catch (e) {
       Sentry.captureException(e);
+    }
+  }
+
+  private static readonly TAB_BAR_PAGES: [RegExp, AppComponent["activeTab"]][] =
+    [
+      [/^\/list\//, "recipes"],
+      [/^\/shopping-lists(\/[^/]+)?$/, "shopping"],
+      [/^\/meal-planners(\/[^/]+)?$/, "meals"],
+      [/^\/(people|settings|labels)$/, "more"],
+    ];
+
+  updateTabBar(url = this.router.url) {
+    const path = url.split("?")[0];
+    const match = AppComponent.TAB_BAR_PAGES.find(([pattern]) =>
+      pattern.test(path),
+    );
+    this.activeTab = match ? match[1] : null;
+    this.showTabBar = !!match && !!this.isLoggedIn && this.phoneQuery.matches;
+  }
+
+  goToTab(tab: "recipes" | "shopping" | "meals" | "more") {
+    switch (tab) {
+      case "recipes":
+        return this.navCtrl.navigateRoot(RouteMap.HomePage.getPath("main"));
+      case "shopping":
+        return this.navCtrl.navigateRoot(RouteMap.ShoppingListsPage.getPath());
+      case "meals":
+        return this.navCtrl.navigateRoot(RouteMap.MealPlansPage.getPath());
+      case "more":
+        return this.menuCtrl.open();
     }
   }
 }

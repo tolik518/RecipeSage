@@ -69,7 +69,10 @@
                 (click)="itemClicked(item)"
                 button
               >
-                <ion-label>{{ item.recipe?.title || item.title }}</ion-label>
+                <ion-label>
+                  <h3>{{ item.recipe?.title || item.title }}</h3>
+                  <p>{{ getMealLabel(item.meal) }}</p>
+                </ion-label>
               </ion-item>
             }
           </ion-item-group>
@@ -119,9 +122,10 @@
                     (click)="itemClicked(item)"
                     button
                   >
-                    <ion-label>{{
-                      item.recipe?.title || item.title
-                    }}</ion-label>
+                    <ion-label>
+                      <h3>{{ item.recipe?.title || item.title }}</h3>
+                      <p>{{ getMealLabel(item.meal) }}</p>
+                    </ion-label>
                   </ion-item>
                 }
               </ion-item-group>

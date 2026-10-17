@@ -2,3 +2,10 @@
   max-width: var(--page-max-width);
   margin: 0 auto;
 }
+
+// Edit / browse buttons per label: clear icons with a full-size tap area
+ion-button.label-action {
+  min-width: 44px;
+  min-height: 44px;
+  margin: 0;
+}

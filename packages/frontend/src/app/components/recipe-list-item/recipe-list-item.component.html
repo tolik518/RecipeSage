@@ -53,19 +53,7 @@
         recipe.recipeLabels && recipe.recipeLabels.length > 0 && showLabels
       ) {
         <p dir="auto">
-          {{ "pages.home.recipe.labels" | translate }}
-          @for (
-            recipeLabel of recipe.recipeLabels;
-            track recipeLabel.label.title;
-            let idx = $index
-          ) {
-            <span
-              >{{ recipeLabel.label.title }}
-              @if (idx + 1 < recipe.recipeLabels.length) {
-                <span>,&nbsp;</span>
-              }
-            </span>
-          }
+          {{ "pages.home.recipe.labels" | translate }} {{ labelList }}
         </p>
       }
       @if (showRating && recipe.rating) {

@@ -495,6 +495,18 @@ export class UtilService {
     return date.toLocaleString(this.getCurrentLocale(), { month: "long" });
   }
 
+  /** "Samstag, 18. Oktober" (the year only when it isn't the current one) */
+  formatDayHeading(date: Date): string {
+    return date.toLocaleDateString(this.getCurrentLocale(), {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      ...(date.getFullYear() !== new Date().getFullYear()
+        ? { year: "numeric" }
+        : {}),
+    });
+  }
+
   formatMonthYear(date: Date): string {
     return date.toLocaleDateString(this.getCurrentLocale(), {
       month: "long",

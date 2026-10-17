@@ -19,6 +19,13 @@ export class RecipeListItemComponent {
   @Input() showSource = true;
   @Input() showFromUser = false;
   @Input() showLabels = true;
+
+  /** "vegetarisch, ofen" */
+  get labelList(): string {
+    return this.recipe.recipeLabels
+      .map((recipeLabel) => recipeLabel.label.title)
+      .join(", ");
+  }
   @Input() showRating = false;
   @Input() selected = false;
   @Input() badgeHandle?: string;

@@ -22,7 +22,7 @@
         <ion-toolbar color="nav">
           <ion-title>
             @if (isSelfHost) {
-              <span>RecipeSage Self Hosted</span>
+              <span>RecipeSage</span>
             }
             @if (!isSelfHost) {
               <img
@@ -74,11 +74,57 @@
       [animated]="enableAnimations"
       [class]="{
         cookingToolbarOpen: cookingToolbarService.pinnedRecipes.length > 0,
+        tabBarOpen: showTabBar,
       }"
     ></ion-router-outlet>
 
     @if (cookingToolbarService.pinnedRecipes.length > 0) {
-      <cooking-toolbar></cooking-toolbar>
+      <cooking-toolbar
+        [style.bottom]="showTabBar ? 'var(--rs-tab-bar-height)' : null"
+      ></cooking-toolbar>
+    }
+
+    @if (showTabBar) {
+      <nav
+        class="app-tab-bar"
+        [attr.aria-label]="'pages.app.tabs.label' | translate"
+      >
+        <button
+          type="button"
+          [class.active]="activeTab === 'recipes'"
+          [attr.aria-current]="activeTab === 'recipes' ? 'page' : null"
+          (click)="goToTab('recipes')"
+        >
+          <ion-icon name="book-outline" aria-hidden="true"></ion-icon>
+          <span>{{ "pages.app.tabs.recipes" | translate }}</span>
+        </button>
+        <button
+          type="button"
+          [class.active]="activeTab === 'shopping'"
+          [attr.aria-current]="activeTab === 'shopping' ? 'page' : null"
+          (click)="goToTab('shopping')"
+        >
+          <ion-icon name="cart-outline" aria-hidden="true"></ion-icon>
+          <span>{{ "pages.app.tabs.shopping" | translate }}</span>
+        </button>
+        <button
+          type="button"
+          [class.active]="activeTab === 'meals'"
+          [attr.aria-current]="activeTab === 'meals' ? 'page' : null"
+          (click)="goToTab('meals')"
+        >
+          <ion-icon name="calendar-outline" aria-hidden="true"></ion-icon>
+          <span>{{ "pages.app.tabs.meals" | translate }}</span>
+        </button>
+        <button
+          type="button"
+          [class.active]="activeTab === 'more'"
+          (click)="goToTab('more')"
+        >
+          <ion-icon name="menu-outline" aria-hidden="true"></ion-icon>
+          <span>{{ "pages.app.tabs.more" | translate }}</span>
+        </button>
+      </nav>
     }
   </ion-split-pane>
 </ion-app>

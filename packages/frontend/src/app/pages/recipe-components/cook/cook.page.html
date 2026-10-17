@@ -9,10 +9,17 @@
     <ion-title dir="auto">{{ recipe?.title }}</ion-title>
 
     <ion-buttons slot="end">
-      <ion-button (click)="changeScale()">
-        {{
+      <ion-button
+        (click)="changeScale()"
+        [attr.aria-label]="
+          'pages.recipeDetails.scaleStatus' | translate: { scale: scaleDisplay }
+        "
+      >
+        <!-- Phones: compact "1×", so it doesn't run into the centred title -->
+        <span class="scale-long">{{
           "pages.recipeDetails.scaleStatus" | translate: { scale: scaleDisplay }
-        }}
+        }}</span>
+        <span class="scale-short">{{ scaleDisplay }}×</span>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
