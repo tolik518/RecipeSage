@@ -146,6 +146,15 @@ ion-badge {
       object-fit: cover;
     }
 
+    // No photo: small muted logo on a soft tint (same as the list view)
+    img.no-image {
+      box-sizing: border-box;
+      object-fit: contain;
+      padding: calc(var(--image-size) * 0.28);
+      background: rgba(var(--ion-color-primary-rgb), 0.08);
+      opacity: 0.65;
+    }
+
     .recipe-card-content {
       padding: 5px;
       padding-left: 12px;
