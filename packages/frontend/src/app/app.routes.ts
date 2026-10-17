@@ -338,6 +338,15 @@ export const appRoutes: Routes = [
     title: "pages.serverSettings.tabTitle",
   },
   {
+    path: RouteMap.TrelloSettingsPage.path,
+    loadComponent: () =>
+      import("./pages/settings-components/trello-settings/trello-settings.page").then(
+        (m) => m.TrelloSettingsPage,
+      ),
+    canDeactivate: [UnsavedChangesGuardService],
+    title: "pages.trelloSettings.tabTitle",
+  },
+  {
     path: RouteMap.ToolsPage.path,
     loadComponent: () =>
       import("./pages/tools/tools.page").then((m) => m.ToolsPage),

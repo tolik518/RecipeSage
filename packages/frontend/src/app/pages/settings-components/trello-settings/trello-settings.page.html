@@ -1,0 +1,113 @@
+<ion-header>
+  <ion-toolbar color="nav">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+
+    <ion-title> {{ "pages.trelloSettings.title" | translate }} </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-wrapper">
+    <info-block icon="checkbox-outline">
+      <ng-container virtualSlot="title">
+        {{ "pages.trelloSettings.intro.title" | translate }}
+      </ng-container>
+      <p>{{ "pages.trelloSettings.intro.body" | translate }}</p>
+    </info-block>
+
+    @if (configured && connectedCardName) {
+      <div class="connected">
+        <ion-icon name="checkmark-circle-outline" color="success"></ion-icon>
+        <span>
+          {{
+            "pages.trelloSettings.connected"
+              | translate: { cardName: connectedCardName }
+          }}
+        </span>
+        @if (connectedCardUrl) {
+          <a [href]="connectedCardUrl" target="_blank" rel="noopener">
+            <ion-icon name="open-outline"></ion-icon>
+          </a>
+        }
+      </div>
+    }
+
+    @if (loaded) {
+      <text-input
+        [label]="'pages.trelloSettings.cardUrl.label' | translate"
+        placeholder="https://trello.com/c/KtgTTfPB/8-einkaufsliste"
+        [helperText]="'pages.trelloSettings.cardUrl.helper' | translate"
+        [errorText]="'pages.trelloSettings.required' | translate"
+        [invalid]="cardUrlInvalid"
+        type="url"
+        inputmode="url"
+        [spellcheck]="false"
+        [(ngModel)]="cardUrl"
+      ></text-input>
+
+      <br />
+
+      <text-input
+        [label]="'pages.trelloSettings.apiKey.label' | translate"
+        [helperText]="'pages.trelloSettings.apiKey.helper' | translate"
+        [errorText]="'pages.trelloSettings.required' | translate"
+        [invalid]="apiKeyInvalid"
+        [spellcheck]="false"
+        [(ngModel)]="apiKey"
+      ></text-input>
+      <p class="hint">
+        <a
+          href="https://trello.com/power-ups/admin"
+          target="_blank"
+          rel="noopener"
+        >
+          {{ "pages.trelloSettings.apiKey.link" | translate }}
+        </a>
+      </p>
+
+      <text-input
+        [label]="'pages.trelloSettings.token.label' | translate"
+        [placeholder]="
+          configured
+            ? ('pages.trelloSettings.token.storedPlaceholder' | translate)
+            : ''
+        "
+        [helperText]="'pages.trelloSettings.token.helper' | translate"
+        [errorText]="'pages.trelloSettings.required' | translate"
+        [invalid]="tokenInvalid"
+        type="password"
+        [spellcheck]="false"
+        [(ngModel)]="token"
+      ></text-input>
+      @if (authorizeUrl; as url) {
+        <p class="hint">
+          <a [href]="url" target="_blank" rel="noopener">
+            {{ "pages.trelloSettings.token.link" | translate }}
+          </a>
+        </p>
+      }
+
+      <ion-button
+        expand="block"
+        class="save-button"
+        [disabled]="saving"
+        (click)="save()"
+      >
+        {{ "pages.trelloSettings.save" | translate }}
+      </ion-button>
+
+      @if (configured) {
+        <ion-button
+          expand="block"
+          color="danger"
+          fill="outline"
+          (click)="remove()"
+        >
+          {{ "pages.trelloSettings.remove.button" | translate }}
+        </ion-button>
+      }
+    }
+  </div>
+</ion-content>

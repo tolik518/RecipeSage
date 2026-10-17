@@ -75,6 +75,7 @@ import {
   notificationsOutline,
   peopleOutline,
   personOutline,
+  checkboxOutline,
   restaurantOutline,
   serverOutline,
   syncOutline,
@@ -168,6 +169,7 @@ export class SettingsPage implements OnDestroy {
       notificationsOutline,
       peopleOutline,
       personOutline,
+      checkboxOutline,
       restaurantOutline,
       serverOutline,
       syncOutline,
@@ -537,6 +539,10 @@ export class SettingsPage implements OnDestroy {
 
   goToAccount() {
     this.navCtrl.navigateForward(RouteMap.AccountPage.getPath());
+  }
+
+  goToTrelloSettings() {
+    this.navCtrl.navigateForward(RouteMap.TrelloSettingsPage.getPath());
   }
 
   goToServerSettings() {

@@ -39,8 +39,11 @@ import {
   IonLabel,
   IonFooter,
 } from "@ionic/angular/standalone";
-import { closeOutline, listOutline } from "ionicons/icons";
+import { closeOutline, listOutline, checkboxOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
+
+/** Select value for the Trello card destination (shopping lists use their object) */
+export const TRELLO_DESTINATION = "trello";
 
 @Component({
   standalone: true,
@@ -87,12 +90,15 @@ export class AddRecipeToShoppingListModalPage {
     this.serverActionsService.shoppingLists.getShoppingLists();
   shoppingLists?: ShoppingListSummary[];
 
-  destinationShoppingList?: ShoppingListSummary;
+  destinationShoppingList?: ShoppingListSummary | typeof TRELLO_DESTINATION;
+
+  trelloCardName?: string;
 
   saving = false;
 
   constructor() {
-    addIcons({ closeOutline, listOutline });
+    addIcons({ closeOutline, listOutline, checkboxOutline });
+    void this.loadTrelloSettings();
     effect(() => {
       const lists = this.shoppingListsQuery.value();
       if (!lists) return;
@@ -107,12 +113,34 @@ export class AddRecipeToShoppingListModalPage {
     this.shoppingListsQuery.refresh();
   }
 
+  private async loadTrelloSettings() {
+    const settings = await this.serverActionsService.trello.getTrelloSettings({
+      "*": () => {
+        // Trello is optional; never block or alert in the modal because of it
+      },
+    });
+    if (!settings?.configured || !settings.cardName) return;
+
+    this.trelloCardName = settings.cardName;
+    if (!this.destinationShoppingList) this.selectLastUsedShoppingList();
+  }
+
+  isTrelloDestination() {
+    return this.destinationShoppingList === TRELLO_DESTINATION;
+  }
+
   selectLastUsedShoppingList() {
     if (!this.shoppingLists) return;
 
     const lastUsedShoppingListId = localStorage.getItem(
       "lastUsedShoppingListId",
     );
+    if (lastUsedShoppingListId === TRELLO_DESTINATION) {
+      if (this.trelloCardName) {
+        this.destinationShoppingList = TRELLO_DESTINATION;
+      }
+      return;
+    }
     this.destinationShoppingList = this.shoppingLists.find(
       (el) => el.id === lastUsedShoppingListId,
     );
@@ -123,7 +151,9 @@ export class AddRecipeToShoppingListModalPage {
 
     localStorage.setItem(
       "lastUsedShoppingListId",
-      this.destinationShoppingList.id,
+      this.destinationShoppingList === TRELLO_DESTINATION
+        ? TRELLO_DESTINATION
+        : this.destinationShoppingList.id,
     );
   }
 
@@ -153,6 +183,14 @@ export class AddRecipeToShoppingListModalPage {
 
     this.saveLastUsedShoppingList();
 
+    if (this.destinationShoppingList === TRELLO_DESTINATION) {
+      await this.saveToTrello();
+      this.saving = false;
+      loading.dismiss();
+      return;
+    }
+    const destinationShoppingList = this.destinationShoppingList;
+
     const items = Object.entries(this.selectedIngredientsByRecipe)
       .map(([recipeId, ingredients]) =>
         (ingredients as ParsedIngredient[]).map((ingredient) => ({
@@ -174,13 +212,70 @@ export class AddRecipeToShoppingListModalPage {
 
     const response =
       await this.serverActionsService.shoppingLists.createShoppingListItems({
-        shoppingListId: this.destinationShoppingList.id,
+        shoppingListId: destinationShoppingList.id,
         items,
       });
 
     this.saving = false;
     loading.dismiss();
     if (!response) return;
+
+    this.modalCtrl.dismiss();
+  }
+
+  private async saveToTrello() {
+    const recipes = this.recipes
+      .map((recipe) => ({
+        title: recipe.title,
+        items: (this.selectedIngredientsByRecipe[recipe.id] ?? [])
+          .map((ingredient) =>
+            ingredient.plaintextContent
+              .trim()
+              .slice(0, SHOPPING_LIST_ITEMS_TITLE_LENGTH_LIMIT),
+          )
+          .filter((title) => title.length > 0),
+      }))
+      .filter((recipe) => recipe.items.length > 0);
+
+    if (recipes.length === 0) {
+      this.modalCtrl.dismiss();
+      return;
+    }
+
+    const showError = async (error: Error) => {
+      const header = await this.translate
+        .get("pages.addRecipeToShoppingListModal.trello.errorHeader")
+        .toPromise();
+      const okay = await this.translate.get("generic.okay").toPromise();
+      const alert = await this.alertCtrl.create({
+        header,
+        message: error.message,
+        buttons: [{ text: okay }],
+      });
+      await alert.present();
+    };
+
+    const response = await this.serverActionsService.trello.addRecipesToTrello(
+      { recipes },
+      {
+        400: showError,
+        412: showError,
+      },
+    );
+    if (!response) return;
+
+    const message = await this.translate
+      .get("pages.addRecipeToShoppingListModal.trello.success", {
+        itemCount: response.itemCount,
+        cardName: this.trelloCardName,
+      })
+      .toPromise();
+    void this.toastCtrl
+      .create({
+        message,
+        duration: 5000,
+      })
+      .then((toast) => toast.present());
 
     this.modalCtrl.dismiss();
   }

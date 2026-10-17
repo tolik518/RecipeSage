@@ -266,6 +266,12 @@ export const RouteMap = {
     },
     path: "settings/server",
   },
+  TrelloSettingsPage: {
+    getPath() {
+      return `/settings/trello`;
+    },
+    path: "settings/trello",
+  },
   ToolsPage: {
     getPath() {
       return `/tools`;

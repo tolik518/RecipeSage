@@ -14,6 +14,7 @@ import { PaymentsActionsService } from "./server-actions/payments-actions.servic
 import { IapActionsService } from "./server-actions/iap-actions.service";
 import { MessagesActionsService } from "./server-actions/messages-actions.service";
 import { DiscoverActionsService } from "./server-actions/discover-actions.service";
+import { TrelloActionsService } from "./server-actions/trello-actions.service";
 
 @Injectable({
   providedIn: "root",
@@ -33,4 +34,5 @@ export class ServerActionsService {
   payments = inject(PaymentsActionsService);
   iap = inject(IapActionsService);
   messages = inject(MessagesActionsService);
+  trello = inject(TrelloActionsService);
 }

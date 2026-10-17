@@ -661,12 +661,28 @@ model User {
   jobs                      Job[]
   stripeEvents              StripeEvent[]
   creditLogs                UserCreditLog[]
+  trelloSettings            UserTrelloSettings?
   discoverRecipes           DiscoverRecipe[]
   discoverRecipeRatings     DiscoverRecipeRating[]
   discoverRecipeSaves       DiscoverRecipeSave[]
   discoverRecipeReports     DiscoverRecipeReport[]
 
   @@map("Users")
+}
+
+model UserTrelloSettings {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @db.Uuid
+  cardId    String   @db.VarChar(255)
+  cardUrl   String   @db.Text
+  cardName  String   @db.Text
+  apiKey    String   @db.VarChar(255)
+  token     String   @db.Text
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("UserTrelloSettings")
 }
 
 model ClipCache {

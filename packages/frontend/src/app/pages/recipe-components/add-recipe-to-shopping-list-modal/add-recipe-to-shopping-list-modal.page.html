@@ -27,7 +27,7 @@
   @if (!shoppingLists) {
     <p>{{ "pages.addRecipeToShoppingListModal.loading" | translate }}</p>
   }
-  @if (shoppingLists && shoppingLists.length > 0) {
+  @if ((shoppingLists && shoppingLists.length > 0) || trelloCardName) {
     <ion-item>
       <ion-select
         label="{{
@@ -40,10 +40,18 @@
         @for (list of shoppingLists; track list) {
           <ion-select-option [value]="list">{{ list.title }}</ion-select-option>
         }
+        @if (trelloCardName) {
+          <ion-select-option value="trello">
+            {{
+              "pages.addRecipeToShoppingListModal.trello.option"
+                | translate: { cardName: trelloCardName }
+            }}
+          </ion-select-option>
+        }
       </ion-select>
     </ion-item>
   }
-  @if (shoppingLists && shoppingLists.length === 0) {
+  @if (shoppingLists && shoppingLists.length === 0 && !trelloCardName) {
     <div (click)="createShoppingList()">
       <p>
         {{ "pages.addRecipeToShoppingListModal.noShoppingLists" | translate
@@ -85,7 +93,10 @@
 
 <ion-footer class="ion-padding">
   <ion-button expand="block" (click)="save()" [disabled]="!isFormValid()">
-    <ion-icon name="list-outline" slot="start"></ion-icon>
+    <ion-icon
+      [name]="isTrelloDestination() ? 'checkbox-outline' : 'list-outline'"
+      slot="start"
+    ></ion-icon>
     <ion-label>
       {{ "pages.addRecipeToShoppingListModal.add" | translate }}
     </ion-label>

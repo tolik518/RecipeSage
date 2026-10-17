@@ -19,6 +19,7 @@ import { iapRouter } from "./procedures/iap/iapRouter";
 import { imagesRouter } from "./procedures/images/imagesRouter";
 import { messagesRouter } from "./procedures/messages/messagesRouter";
 import { discoverRouter } from "./procedures/discover/discoverRouter";
+import { trelloRouter } from "./procedures/trello/trelloRouter";
 
 export const appRouter = router({
   discover: discoverRouter,
@@ -35,6 +36,7 @@ export const appRouter = router({
   jobs: jobsRouter,
   images: imagesRouter,
   messages: messagesRouter,
+  trello: trelloRouter,
 });
 
 export const trpcExpressMiddleware = createExpressMiddleware({
