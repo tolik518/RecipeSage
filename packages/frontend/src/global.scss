@@ -103,3 +103,9 @@ ion-searchbar input::-webkit-search-cancel-button {
 :root {
   --rs-tab-bar-height: calc(56px + var(--ion-safe-area-bottom, 0px));
 }
+
+// Where the bottom tab bar is shown, its "Mehr" tab opens the menu, so the
+// header's menu button would be a second way to do the same
+ion-app.tab-bar-visible ion-menu-button {
+  display: none;
+}
