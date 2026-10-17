@@ -11,6 +11,9 @@
 
   .infinite-scrolling-container {
     overflow-y: scroll;
+    // Room at the end so the last recipe can scroll clear of the "+" button
+    // (this list scrolls itself, not the page)
+    padding-bottom: 88px;
   }
 }
 

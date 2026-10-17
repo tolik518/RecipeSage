@@ -125,6 +125,16 @@ export class AddRecipeToShoppingListModalPage {
     if (!this.destinationShoppingList) this.selectLastUsedShoppingList();
   }
 
+  /**
+   * Lists are re-fetched as new objects when the modal refreshes, so match
+   * the selection by id (the Trello option is a fixed string)
+   */
+  compareDestinations = (
+    a: ShoppingListSummary | typeof TRELLO_DESTINATION | undefined,
+    b: ShoppingListSummary | typeof TRELLO_DESTINATION | undefined,
+  ) =>
+    (typeof a === "string" ? a : a?.id) === (typeof b === "string" ? b : b?.id);
+
   isTrelloDestination() {
     return this.destinationShoppingList === TRELLO_DESTINATION;
   }

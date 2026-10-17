@@ -86,7 +86,10 @@ ion-modal.rs-auto-sheet {
 
 // Leave room at the end of the list so the last item can scroll clear of a
 // floating "+" button
-ion-content:has(> ion-fab[vertical="bottom"]) {
+// (pages whose list scrolls itself, like the recipe list, handle this inside the list)
+ion-content:has(> ion-fab[vertical="bottom"]):not(
+    :has(.infinite-scrolling-container)
+  ) {
   --padding-bottom: 88px;
 }
 
