@@ -37,8 +37,6 @@
           <h2 class="recipeTitle ion-text-wrap">{{ recipe.title }}</h2>
           @if (
             recipe.rating ||
-            recipe.source ||
-            recipe.url ||
             recipe.activeTime ||
             recipe.totalTime ||
             recipe.yield
@@ -50,27 +48,6 @@
                     <p>
                       <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
                       <rating [rating]="recipe.rating"></rating>
-                    </p>
-                  </ion-col>
-                }
-                @if (recipe.source || recipe.url) {
-                  <ion-col class="ion-no-padding" size="auto">
-                    <p class="ion-text-wrap">
-                      <b>{{ "pages.recipeDetails.source" | translate }}: </b>
-                      @if (recipe.url.trim()) {
-                        <a
-                          href="{{ recipeLinkUrl }}"
-                          target="_blank"
-                          rel="noreferrer noopener"
-                          >{{
-                            recipe.source.trim() ||
-                              utilService.truncate(recipe.url.trim(), 40)
-                          }}</a
-                        >
-                      }
-                      @if (!recipe.url.trim()) {
-                        <span>{{ recipe.source.trim() }}</span>
-                      }
                     </p>
                   </ion-col>
                 }
@@ -105,12 +82,7 @@
         </ion-label>
       </ion-item>
       @if (
-        recipe.rating ||
-        recipe.source ||
-        recipe.url ||
-        recipe.activeTime ||
-        recipe.totalTime ||
-        recipe.yield
+        recipe.rating || recipe.activeTime || recipe.totalTime || recipe.yield
       ) {
         <ion-item class="metacontainer-mobile" lines="none">
           <ion-grid class="meta">
@@ -120,24 +92,6 @@
                   <p>
                     <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
                     <rating [rating]="recipe.rating"></rating>
-                  </p>
-                </ion-col>
-              }
-              @if (recipe.source || recipe.url) {
-                <ion-col class="ion-no-padding" size="auto">
-                  <p>
-                    <b>{{ "pages.recipeDetails.source" | translate }}: </b>
-                    @if (recipe.url.trim()) {
-                      <a
-                        href="{{ recipeLinkUrl }}"
-                        target="_blank"
-                        rel="noreferrer noopener"
-                        >{{ recipe.source.trim() || recipe.url }}</a
-                      >
-                    }
-                    @if (!recipe.url.trim()) {
-                      <span>{{ recipe.source.trim() }}</span>
-                    }
                   </p>
                 </ion-col>
               }
@@ -877,6 +831,24 @@
       }
       <ion-item lines="full">
         <ion-label class="section-title">
+          @if (recipe.source || recipe.url) {
+            <p class="recipe-source ion-text-wrap">
+              {{ "pages.recipeDetails.source" | translate }}:
+              @if (recipe.url.trim()) {
+                <a
+                  href="{{ recipeLinkUrl }}"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  >{{
+                    recipe.source.trim() ||
+                      utilService.truncate(recipe.url.trim(), 40)
+                  }}</a
+                >
+              } @else {
+                <span>{{ recipe.source.trim() }}</span>
+              }
+            </p>
+          }
           <p>
             <i>
               {{ "pages.recipeDetails.created" | translate }}

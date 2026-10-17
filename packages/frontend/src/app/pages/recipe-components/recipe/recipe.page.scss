@@ -295,7 +295,9 @@ ion-item:has(> ion-label.section-title) ion-icon {
   color: var(--ion-color-primary);
 }
 
-ion-label.section-title p {
+// Only the icon headings ("Zutaten", ...); the created/source info at the
+// bottom reuses the class but stays small
+ion-item:has(> ion-icon) > ion-label.section-title p {
   font-size: 1.05rem;
   font-weight: 600;
   color: var(--ion-text-color);
