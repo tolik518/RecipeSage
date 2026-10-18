@@ -1,8 +1,61 @@
 @import "../../../../theme/shared-variables.scss";
 
+// Cook mode is read from a distance: clear states (done / current step) and a
+// little colour for structure. Sizes are in em/rem, which follow the cook mode
+// font size preference.
+
 .cook-wrapper {
-  max-width: 1250px;
+  max-width: var(--wide-page-max-width);
   margin: 0 auto;
+}
+
+// Progress under the toolbar: steps done of all steps
+.cook-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 16px 8px;
+  background: var(--ion-color-nav);
+  color: var(--ion-color-nav-contrast);
+
+  .cook-progress__track {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(var(--ion-color-primary-rgb), 0.15);
+    overflow: hidden;
+  }
+
+  .cook-progress__bar {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--ion-color-primary);
+    transition: width 0.3s ease;
+  }
+
+  .cook-progress__label {
+    font-size: 0.7rem;
+    white-space: nowrap;
+    opacity: 0.75;
+  }
+
+  &.cook-progress--done .cook-progress__bar {
+    background: var(--ion-color-success);
+  }
+}
+
+// Phones: the full title (the header cuts it off)
+.cook-title {
+  margin: 0 0 16px;
+  font-size: 1.3rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+@media only screen and (min-width: $desktop-breakpoint) {
+  .cook-title {
+    display: none;
+  }
 }
 
 .ingredients-instructions {
@@ -11,9 +64,18 @@
   gap: 24px;
 }
 
+// Ingredients on a tinted card
 .ingredients {
   flex-shrink: 0;
+  box-sizing: border-box;
   width: 100%;
+  padding: 16px 12px 10px;
+  border-radius: 16px;
+  background: rgba(var(--ion-color-primary-rgb), 0.06);
+
+  .section-title {
+    padding-inline-start: 6px;
+  }
 }
 
 .instructions {
@@ -24,10 +86,18 @@
 @media (min-width: 768px) {
   .ingredients-instructions {
     flex-wrap: nowrap;
+    gap: 32px;
   }
 
+  // Ingredients stay in view while working through the steps
   .ingredients {
-    width: 320px;
+    position: sticky;
+    top: 0;
+    align-self: flex-start;
+    width: 340px;
+    max-height: calc(100vh - 160px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .instructions {
@@ -35,67 +105,188 @@
   }
 }
 
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+// Section headers within ingredients/steps ("SAUCE ─────")
+.section-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 18px 6px 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ion-color-primary);
+
+  &::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: rgba(var(--ion-color-primary-rgb), 0.25);
+  }
+}
+
+.section-title + .section-divider {
+  margin-top: 4px;
+}
+
+// Shared by ingredients and steps: tappable rows that tick off
+.ingredient,
+.step {
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  &:focus-visible {
+    outline: 2px solid var(--ion-color-primary);
+    outline-offset: 2px;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.04);
+    }
+  }
+}
+
+.ingredient {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 8px 6px;
+  border-radius: 10px;
+  line-height: 1.4;
+
+  .check {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    width: 1.15em;
+    height: 1.15em;
+    margin-top: 0.12em;
+    border: 2px solid rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.35);
+    border-radius: 50%;
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease;
+
+    ion-icon {
+      font-size: 0.8em;
+      color: #ffffff;
+    }
+  }
+
+  &.complete {
+    .check {
+      border-color: var(--ion-color-success);
+      background: var(--ion-color-success);
+    }
+
+    .check + span {
+      text-decoration: line-through;
+      opacity: 0.45;
+    }
+  }
+}
+
+.step {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin: 4px 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border-inline-start: 4px solid transparent;
+  line-height: 1.5;
+  transition: background 0.2s ease;
+
+  .step-number {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 1.75em;
+    height: 1.75em;
+    margin-top: -0.05em;
+    border-radius: 50%;
+    font-size: 0.85em;
+    font-weight: 700;
+    background: rgba(var(--ion-color-primary-rgb), 0.12);
+    color: var(--ion-color-primary);
+  }
+
+  // The next step to do
+  &.current {
+    background: rgba(var(--ion-color-primary-rgb), 0.09);
+    border-inline-start-color: var(--ion-color-primary);
+
+    .step-number {
+      background: var(--ion-color-primary);
+      color: var(--ion-color-primary-contrast);
+    }
+  }
+
+  &.complete {
+    .step-number {
+      background: var(--ion-color-success);
+      color: var(--ion-color-success-contrast);
+    }
+
+    .instructionContent {
+      text-decoration: line-through;
+      opacity: 0.45;
+    }
+  }
+}
+
+// Notes as a tip box
 .notes {
-  margin-top: 24px;
+  margin-top: 32px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  border-inline-start: 4px solid var(--ion-color-warning);
+  background: rgba(var(--ion-color-warning-rgb), 0.12);
+
+  .section-title ion-icon {
+    color: var(--ion-color-warning-shade);
+  }
+
+  p {
+    margin: 6px 0;
+  }
 
   .header {
     font-weight: bold;
   }
 }
 
-.section-title {
-  font-weight: bold;
-  margin-bottom: 12px;
+// Phones: opens the ingredients as a sheet once they've scrolled away
+.ingredients-fab {
+  position: absolute;
+  inset-inline-end: 16px;
+  bottom: calc(16px + var(--ion-safe-area-bottom, 0px));
+  margin: 0;
+  --box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  font-size: 0.8rem;
 }
 
-.ingredient {
-  margin: 0;
-  padding: 10px 0;
-  line-height: 1.4;
-
-  &.header {
-    margin-top: 8px;
-    margin-bottom: 4px;
-  }
-
-  &:first-child.header {
-    margin-top: 0;
-  }
-
-  &.ingredientContent {
-    cursor: pointer;
-  }
-
-  &.complete {
-    text-decoration: line-through;
-    opacity: 0.7;
+// Room at the end so the last lines can scroll clear of the button
+@media (max-width: 767px) {
+  .cook-wrapper {
+    padding-bottom: 72px;
   }
 }
 
-.instruction {
-  margin: 0;
-  padding: 10px 0;
-  line-height: 1.5;
-
-  .sectionHeader {
-    display: block;
-    font-weight: bold;
-    margin: 8px 0 4px;
-  }
-
-  &:first-child {
-    .sectionHeader {
-      margin-top: 0;
-    }
-  }
-
-  .instructionContent {
-    cursor: pointer;
-  }
-
-  span.complete .instructionContent {
-    text-decoration: line-through;
-    opacity: 0.7;
+@media (min-width: 768px) {
+  .ingredients-fab {
+    display: none;
   }
 }
 

@@ -1960,6 +1960,7 @@
     "pages.recipeDetailsPopover.enterCookMode": "Kochmodus starten",
     "pages.cook.tabTitle": "Kochmodus – RecipeSage",
     "pages.cook.loading": "Rezept wird geladen …",
+    "pages.cook.progress": "{{done}} von {{total}} Schritten",
     "pages.labels.searchPlaceholder": "Labels und Kategorien durchsuchen",
     "pages.labels.noResults": "Für deinen Suchbegriff wurden keine Labels oder Kategorien gefunden.",
     "pages.manageLabelModal.rename.placeholder": "Neuer Label-Name",

@@ -1,4 +1,11 @@
-import { Component, inject } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  NgZone,
+  OnDestroy,
+  ViewChild,
+  inject,
+} from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { NavController, ModalController } from "@ionic/angular/standalone";
 import { TranslateService } from "@ngx-translate/core";
@@ -41,8 +48,15 @@ import {
   IonContent,
   IonSpinner,
   IonLabel,
+  IonModal,
 } from "@ionic/angular/standalone";
-import { alertCircleOutline, closeOutline } from "ionicons/icons";
+import {
+  alertCircleOutline,
+  bulbOutline,
+  checkmark,
+  closeOutline,
+  listOutline,
+} from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 interface CookableRecipe {
@@ -71,9 +85,10 @@ interface CookableRecipe {
     IonContent,
     IonSpinner,
     IonLabel,
+    IonModal,
   ],
 })
-export class CookPage {
+export class CookPage implements OnDestroy {
   private navCtrl = inject(NavController);
   private modalCtrl = inject(ModalController);
   private route = inject(ActivatedRoute);
@@ -86,6 +101,7 @@ export class CookPage {
   private serverActionsService = inject(ServerActionsService);
   private translate = inject(TranslateService);
   private titleService = inject(Title);
+  private ngZone = inject(NgZone);
   utilService = inject(UtilService);
 
   wakeLockRequest: null | {
@@ -104,8 +120,35 @@ export class CookPage {
   decimalNotationMode: DecimalNotation = ".";
   unitSystem: UnitSystem = "original";
 
+  // Steps are numbered straight through, across section headers
+  stepNumbers: number[] = [];
+  totalSteps = 0;
+
+  // Phones: a button opens the ingredients as a sheet once they've scrolled away
+  ingredientsSheetOpen = false;
+  ingredientsInView = true;
+  private ingredientsObserver?: IntersectionObserver;
+
+  @ViewChild("ingredientsSection") set ingredientsSection(
+    ref: ElementRef<HTMLElement> | undefined,
+  ) {
+    this.ingredientsObserver?.disconnect();
+    this.ingredientsInView = true;
+    if (!ref) return;
+    this.ingredientsObserver = new IntersectionObserver(([entry]) =>
+      this.ngZone.run(() => (this.ingredientsInView = entry.isIntersecting)),
+    );
+    this.ingredientsObserver.observe(ref.nativeElement);
+  }
+
   constructor() {
-    addIcons({ alertCircleOutline, closeOutline });
+    addIcons({
+      alertCircleOutline,
+      bulbOutline,
+      checkmark,
+      closeOutline,
+      listOutline,
+    });
     this.applyRouteParams();
   }
 
@@ -139,7 +182,12 @@ export class CookPage {
     this.applyCookFontSize();
   }
 
+  ngOnDestroy() {
+    this.ingredientsObserver?.disconnect();
+  }
+
   ionViewWillLeave() {
+    this.ingredientsSheetOpen = false;
     this.releaseWakeLock();
     this.restoreFontSize();
     this.fullscreenService.exit();
@@ -247,6 +295,11 @@ export class CookPage {
       this.scale,
       { targetSystem, decimalNotationMode, images: this.getInlineImageRefs() },
     );
+    let stepNumber = 0;
+    this.stepNumbers = this.instructions.map((instruction) =>
+      instruction.isHeader ? 0 : ++stepNumber,
+    );
+    this.totalSteps = stepNumber;
     if (this.recipe.notes && this.recipe.notes.length > 0) {
       this.notes = parseNotes(this.recipe.notes, this.scale, {
         targetSystem,
@@ -321,6 +374,21 @@ export class CookPage {
     return this.recipeCompletionTrackerService.getInstructionComplete(
       this.recipeId,
       idx,
+    );
+  }
+
+  get doneSteps(): number {
+    return (this.instructions ?? []).filter(
+      (instruction, idx) =>
+        !instruction.isHeader && this.getInstructionComplete(idx),
+    ).length;
+  }
+
+  // The first step not ticked off yet: where you are
+  get currentStepIdx(): number {
+    return (this.instructions ?? []).findIndex(
+      (instruction, idx) =>
+        !instruction.isHeader && !this.getInstructionComplete(idx),
     );
   }
 

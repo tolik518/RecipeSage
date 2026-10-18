@@ -378,6 +378,7 @@
 
   "pages.cook.tabTitle": "Cook Mode - RecipeSage",
   "pages.cook.loading": "Loading recipe...",
+  "pages.cook.progress": "{{done}} of {{total}} steps",
   "pages.cook.loadFailed": "We couldn't load this recipe. Please check your connection and try again.",
   "pages.app.localDbUpgrade.confirm": "A new version of the app is available. The app will refresh to load the new version",
   "pages.app.localDbUpgrade.notRefreshed": "The app will not work correctly until it is refreshed",
