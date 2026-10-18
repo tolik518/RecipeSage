@@ -3,7 +3,7 @@
 # way upstream CI does (see .circleci/config.yml in the fork). No Node needed on
 # the host: the frontend is built inside a node container.
 #
-# Usage: ./build.sh [tag]            (default tag: v4.0.13-trello)
+# Usage: ./build.sh [tag]            (default tag: v4.0.17-trello)
 #   APP_SRC=/path/to/RecipeSage ./build.sh
 #   BUILD=static ./build.sh            (only the frontend image; also: BUILD=api)
 #
@@ -14,7 +14,7 @@ set -euo pipefail
 
 cd "$(dirname "$0")"
 
-TAG="${1:-v4.0.13-trello}"
+TAG="${1:-v4.0.17-trello}"
 APP_SRC="$(cd "${APP_SRC:-../recipesage-app}" && pwd)"
 NODE_IMAGE="node:24.13-alpine"
 BUILD="${BUILD:-api static}"

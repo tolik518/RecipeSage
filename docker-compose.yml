@@ -1,5 +1,5 @@
 # RecipeSage (self-hosted) — https://github.com/julianpoy/recipesage-selfhost
-# Based on recipesage-selfhost config version 2026-08-16, RecipeSage version 4.0.13.
+# Based on recipesage-selfhost config version 2026-08-16, RecipeSage version 4.0.17 (app; the config itself is unchanged upstream).
 # Fronted by host nginx at https://rezepte.r0.fyi -> 127.0.0.1:7270 (the `proxy` container).
 
 x-common-env: &common-env
@@ -16,8 +16,9 @@ x-common-env: &common-env
   POSTGRES_USER: recipesage_selfhost
   POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in recipesage/.env}
   DATABASE_URL: postgresql://recipesage_selfhost:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in recipesage/.env}@postgres:5432/recipesage_selfhost
-  # Uses RecipeSage cloud by default; uncomment the grocery-categorizer service to run locally.
-  GROCERY_CATEGORIZER_URL: https://grocery-categorizer.recipesage.com/
+  # Shopping-list categories come from the local grocery-categorizer service below
+  # (upstream's default is the RecipeSage cloud: https://grocery-categorizer.recipesage.com/).
+  GROCERY_CATEGORIZER_URL: http://grocery-categorizer:8000/
   # Optional AI features (clip-from-URL, OCR, assistant). Uses the Anthropic API directly.
   # The key and any model overrides come from .env (see .env.example); with AI_API_KEY
   # empty the app still runs, the AI features just fail.
@@ -43,20 +44,29 @@ services:
     image: julianpoy/recipesage-selfhost-proxy:2026-08-16
     ports:
       - "127.0.0.1:7270:80"
+    # The proxy's nginx resolves the other containers' addresses only at start, so it
+    # must restart whenever one of them is recreated (deploys, add-user.sh), or it
+    # keeps sending traffic to the old address and the site returns 502.
     depends_on:
-      - static
-      - api
-      - pushpin
+      static:
+        condition: service_started
+        restart: true
+      api:
+        condition: service_started
+        restart: true
+      pushpin:
+        condition: service_started
+        restart: true
     restart: unless-stopped
   static: # Hosts frontend assets
     container_name: recipesage_static
-    # Custom build of tolik518/RecipeSage, branch dev (v4.0.13 + our changes). See ./build.sh
-    image: recipesage-custom:static-v4.0.13-trello
+    # Custom build of tolik518/RecipeSage, branch dev (v4.0.17 + our changes). See ./build.sh
+    image: recipesage-custom:static-v4.0.17-trello
     restart: unless-stopped
   api: # Hosts backend API
     container_name: recipesage_api
-    # Custom build of tolik518/RecipeSage, branch dev (v4.0.13 + our changes). See ./build.sh
-    image: recipesage-custom:api-v4.0.13-trello
+    # Custom build of tolik518/RecipeSage, branch dev (v4.0.17 + our changes). See ./build.sh
+    image: recipesage-custom:api-v4.0.17-trello
     depends_on:
       postgres:
         condition: service_healthy
@@ -130,13 +140,13 @@ services:
     image: valkey/valkey
 
   # ===
-  # Grocery Categorizer (optional, resource-intensive, needs AVX CPU support).
-  # If enabled, set GROCERY_CATEGORIZER_URL above to http://grocery-categorizer:8000/
-  # ===
-  # grocery-categorizer:
-  #   container_name: recipesage_grocery_categorizer
-  #   image: julianpoy/grocery-categorizer:f9d9562
-  #   restart: unless-stopped
+  # Grocery Categorizer: an ML model that sorts shopping-list items into aisles.
+  # Needs AVX CPU support and uses about 550 MB of RAM. Only reachable inside this stack.
+  grocery-categorizer:
+    container_name: recipesage_grocery_categorizer
+    image: julianpoy/grocery-categorizer:f9d9562
+    mem_limit: 1g
+    restart: unless-stopped
 
 volumes:
   apimedia:

@@ -21,23 +21,30 @@ fi
 
 PROXY="http://127.0.0.1:7270"
 
+# Recreate api with the given env, then restart the proxy: its nginx resolves the api's
+# address only at start, and a recreated api usually gets a new one (else: 502s).
+recreate_api() {
+  docker compose up -d api >/dev/null 2>&1
+  docker compose restart proxy >/dev/null 2>&1
+}
+
 relock() {
   # Recreate api with the default (DISABLE_REGISTRATION=true).
-  docker compose up -d api >/dev/null 2>&1
+  recreate_api
 }
 trap relock EXIT   # always re-lock, even on error/ctrl-c
 
 echo "==> Opening registration (temporary)..."
-RS_DISABLE_REGISTRATION=false docker compose up -d api >/dev/null 2>&1
+RS_DISABLE_REGISTRATION=false recreate_api
 
 echo "==> Waiting for API to come back up..."
-for i in $(seq 1 60); do
+for i in $(seq 1 180); do
   if curl -fsS -o /dev/null "$PROXY/api/trpc/users.register" 2>/dev/null \
      || curl -s "$PROXY/api/trpc/users.register" 2>/dev/null | grep -q METHOD_NOT_SUPPORTED; then
     break
   fi
   sleep 1
-  [[ $i -eq 60 ]] && { echo "API did not become ready in time." >&2; exit 1; }
+  [[ $i -eq 180 ]] && { echo "API did not become ready in time." >&2; exit 1; }
 done
 
 echo "==> Registering $EMAIL ..."
