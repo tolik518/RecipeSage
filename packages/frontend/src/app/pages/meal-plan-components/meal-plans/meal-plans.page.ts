@@ -11,6 +11,7 @@ import { NullStateComponent } from "../../../components/null-state/null-state.co
 import {
   IonHeader,
   IonToolbar,
+  IonButton,
   IonButtons,
   IonMenuButton,
   IonTitle,
@@ -36,6 +37,7 @@ import { addIcons } from "ionicons";
     NullStateComponent,
     IonHeader,
     IonToolbar,
+    IonButton,
     IonButtons,
     IonMenuButton,
     IonTitle,

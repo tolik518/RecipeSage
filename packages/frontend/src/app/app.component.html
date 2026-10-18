@@ -6,7 +6,7 @@
     [disabled]="
       inCookMode || !isLoggedIn || !preferences[preferenceKeys.EnableSplitPane]
     "
-    when="(min-width: 1200px)"
+    when="(min-width: 1024px)"
   >
     <ion-menu
       (ionWillOpen)="updateNavList()"
@@ -43,6 +43,8 @@
                 [routerDirection]="'root'"
                 [routerLink]="[p.url]"
                 [replaceUrl]="true"
+                [class.nav-active]="isNavActive(p)"
+                [attr.aria-current]="isNavActive(p) ? 'page' : null"
               >
                 <ion-icon slot="start" [name]="p.icon"></ion-icon>
                 <ion-label class="ion-text-wrap">

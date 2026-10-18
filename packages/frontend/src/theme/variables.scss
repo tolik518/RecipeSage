@@ -297,6 +297,8 @@
 
   --content-max-width: 700px;
   --page-max-width: 900px;
+  // Recipe pages (viewing and editing) use the same, wider column
+  --wide-page-max-width: 1100px;
 
   // Default theme is light
   .theme-default {

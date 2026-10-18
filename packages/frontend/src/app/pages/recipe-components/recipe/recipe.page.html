@@ -17,112 +17,167 @@
 <ion-content class="ion-padding">
   @if (recipe) {
     <div class="page-wrapper">
-      @if (recipe.recipeImages.length) {
-        <button
-          type="button"
-          class="recipe-hero"
-          [attr.aria-label]="recipe.title"
-          (click)="openImageViewer()"
-        >
-          <img [cachedSrc]="sortedRecipeImages()[0].image.location" alt="" />
-          @if (recipe.recipeImages.length > 1) {
-            <span class="recipe-hero__count"
-              >1/{{ recipe.recipeImages.length }}</span
-            >
-          }
-        </button>
-      }
-      <ion-item lines="none">
-        <ion-label dir="auto">
-          <h2 class="recipeTitle ion-text-wrap">{{ recipe.title }}</h2>
+      <!-- Wide screens: photo on the left, title/info/actions on the right -->
+      <div class="recipe-header" [class.has-hero]="recipe.recipeImages.length">
+        @if (recipe.recipeImages.length) {
+          <button
+            type="button"
+            class="recipe-hero"
+            [attr.aria-label]="recipe.title"
+            (click)="openImageViewer()"
+          >
+            <img [cachedSrc]="sortedRecipeImages()[0].image.location" alt="" />
+            @if (recipe.recipeImages.length > 1) {
+              <span class="recipe-hero__count"
+                >1/{{ recipe.recipeImages.length }}</span
+              >
+            }
+          </button>
+        }
+        <div class="recipe-header__info">
+          <ion-item lines="none">
+            <ion-label dir="auto">
+              <h2 class="recipeTitle ion-text-wrap">{{ recipe.title }}</h2>
+              @if (
+                recipe.rating ||
+                recipe.activeTime ||
+                recipe.totalTime ||
+                recipe.yield
+              ) {
+                <ion-grid class="meta metacontainer-desktop">
+                  <ion-row class="ion-justify-content-start">
+                    @if (recipe.rating) {
+                      <ion-col class="ion-no-padding" size="auto">
+                        <p>
+                          <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
+                          <rating [rating]="recipe.rating"></rating>
+                        </p>
+                      </ion-col>
+                    }
+                    @if (recipe.activeTime) {
+                      <ion-col class="ion-no-padding" size="auto">
+                        <p class="ion-text-wrap">
+                          <b
+                            >{{
+                              "pages.recipeDetails.activeTime" | translate
+                            }}: </b
+                          >{{ recipe.activeTime }}
+                        </p>
+                      </ion-col>
+                    }
+                    @if (recipe.totalTime) {
+                      <ion-col class="ion-no-padding" size="auto">
+                        <p class="ion-text-wrap">
+                          <b
+                            >{{
+                              "pages.recipeDetails.totalTime" | translate
+                            }}: </b
+                          >{{ recipe.totalTime }}
+                        </p>
+                      </ion-col>
+                    }
+                    @if (recipe.yield) {
+                      <ion-col class="ion-no-padding" size="auto">
+                        <p class="ion-text-wrap">
+                          <b>{{ "pages.recipeDetails.yield" | translate }}: </b
+                          >{{ recipe.yield }}
+                        </p>
+                      </ion-col>
+                    }
+                  </ion-row>
+                </ion-grid>
+              }
+              <p dir="auto" class="ion-text-wrap">{{ recipe.description }}</p>
+            </ion-label>
+          </ion-item>
           @if (
             recipe.rating ||
             recipe.activeTime ||
             recipe.totalTime ||
             recipe.yield
           ) {
-            <ion-grid class="meta metacontainer-desktop">
-              <ion-row class="ion-justify-content-start">
-                @if (recipe.rating) {
-                  <ion-col class="ion-no-padding" size="auto">
-                    <p>
-                      <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
-                      <rating [rating]="recipe.rating"></rating>
-                    </p>
-                  </ion-col>
-                }
-                @if (recipe.activeTime) {
-                  <ion-col class="ion-no-padding" size="auto">
-                    <p class="ion-text-wrap">
-                      <b>{{ "pages.recipeDetails.activeTime" | translate }}: </b
-                      >{{ recipe.activeTime }}
-                    </p>
-                  </ion-col>
-                }
-                @if (recipe.totalTime) {
-                  <ion-col class="ion-no-padding" size="auto">
-                    <p class="ion-text-wrap">
-                      <b>{{ "pages.recipeDetails.totalTime" | translate }}: </b
-                      >{{ recipe.totalTime }}
-                    </p>
-                  </ion-col>
-                }
-                @if (recipe.yield) {
-                  <ion-col class="ion-no-padding" size="auto">
-                    <p class="ion-text-wrap">
-                      <b>{{ "pages.recipeDetails.yield" | translate }}: </b
-                      >{{ recipe.yield }}
-                    </p>
-                  </ion-col>
-                }
-              </ion-row>
-            </ion-grid>
+            <ion-item class="metacontainer-mobile" lines="none">
+              <ion-grid class="meta">
+                <ion-row class="ion-justify-content-start">
+                  @if (recipe.rating) {
+                    <ion-col class="ion-no-padding" size="auto">
+                      <p>
+                        <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
+                        <rating [rating]="recipe.rating"></rating>
+                      </p>
+                    </ion-col>
+                  }
+                  @if (recipe.activeTime) {
+                    <ion-col class="ion-no-padding" size="auto">
+                      <p>
+                        <b
+                          >{{
+                            "pages.recipeDetails.activeTime" | translate
+                          }}: </b
+                        >{{ recipe.activeTime }}
+                      </p>
+                    </ion-col>
+                  }
+                  @if (recipe.totalTime) {
+                    <ion-col class="ion-no-padding" size="auto">
+                      <p>
+                        <b
+                          >{{
+                            "pages.recipeDetails.totalTime" | translate
+                          }}: </b
+                        >{{ recipe.totalTime }}
+                      </p>
+                    </ion-col>
+                  }
+                  @if (recipe.yield) {
+                    <ion-col class="ion-no-padding" size="auto">
+                      <p>
+                        <b>{{ "pages.recipeDetails.yield" | translate }}: </b
+                        >{{ recipe.yield }}
+                      </p>
+                    </ion-col>
+                  }
+                </ion-row>
+              </ion-grid>
+            </ion-item>
           }
-          <p dir="auto" class="ion-text-wrap">{{ recipe.description }}</p>
-        </ion-label>
-      </ion-item>
-      @if (
-        recipe.rating || recipe.activeTime || recipe.totalTime || recipe.yield
-      ) {
-        <ion-item class="metacontainer-mobile" lines="none">
-          <ion-grid class="meta">
-            <ion-row class="ion-justify-content-start">
-              @if (recipe.rating) {
-                <ion-col class="ion-no-padding" size="auto">
-                  <p>
-                    <b>{{ "pages.recipeDetails.rating" | translate }}:</b>
-                    <rating [rating]="recipe.rating"></rating>
-                  </p>
-                </ion-col>
+          @if (isLoggedIn && recipe.folder === "main") {
+            <!-- Wide screens: the most used actions right under the title (phones use the action bar) -->
+            <div class="recipe-quick-actions">
+              <ion-button (click)="addRecipeToShoppingList()">
+                <ion-icon name="list-outline" slot="start"></ion-icon>
+                {{ "pages.recipeDetails.actionBar.shoppingList" | translate }}
+              </ion-button>
+              <ion-button fill="outline" (click)="addRecipeToMealPlan()">
+                <ion-icon name="calendar-outline" slot="start"></ion-icon>
+                {{ "pages.recipeDetails.actionBar.mealPlan" | translate }}
+              </ion-button>
+              <ion-button fill="outline" (click)="enterCookMode()">
+                <ion-icon name="restaurant-outline" slot="start"></ion-icon>
+                {{ "pages.recipeDetails.actionBar.cookMode" | translate }}
+              </ion-button>
+              @if (recipe.userId === me()?.id) {
+                <ion-button fill="outline" (click)="editRecipe()">
+                  <ion-icon name="create-outline" slot="start"></ion-icon>
+                  {{ "pages.recipeDetails.actionBar.edit" | translate }}
+                </ion-button>
               }
-              @if (recipe.activeTime) {
-                <ion-col class="ion-no-padding" size="auto">
-                  <p>
-                    <b>{{ "pages.recipeDetails.activeTime" | translate }}: </b
-                    >{{ recipe.activeTime }}
-                  </p>
-                </ion-col>
-              }
-              @if (recipe.totalTime) {
-                <ion-col class="ion-no-padding" size="auto">
-                  <p>
-                    <b>{{ "pages.recipeDetails.totalTime" | translate }}: </b
-                    >{{ recipe.totalTime }}
-                  </p>
-                </ion-col>
-              }
-              @if (recipe.yield) {
-                <ion-col class="ion-no-padding" size="auto">
-                  <p>
-                    <b>{{ "pages.recipeDetails.yield" | translate }}: </b
-                    >{{ recipe.yield }}
-                  </p>
-                </ion-col>
-              }
-            </ion-row>
-          </ion-grid>
-        </ion-item>
-      }
+              <ion-button
+                fill="clear"
+                (click)="presentPopover($event)"
+                [attr.aria-label]="
+                  'pages.recipeDetails.actionBar.more' | translate
+                "
+              >
+                <ion-icon
+                  name="ellipsis-horizontal"
+                  slot="icon-only"
+                ></ion-icon>
+              </ion-button>
+            </div>
+          }
+        </div>
+      </div>
       @if (recipe.folder === "inbox" && recipe.fromUser) {
         <ion-item lines="none">
           <p class="ion-text-wrap">
@@ -763,26 +818,6 @@
           <!-- Actions that don't modify someone else's recipe, e.g. a friend's shared one -->
           <ion-row class="action-buttons ion-justify-content-around">
             <ion-col class="ion-text-center" size="auto">
-              <ion-button
-                (click)="addRecipeToShoppingList()"
-                fill="clear"
-                size="small"
-              >
-                <ion-icon name="list-outline" slot="start"></ion-icon>
-                {{ "pages.recipeDetails.addToShoppingList" | translate }}
-              </ion-button>
-            </ion-col>
-            <ion-col class="ion-text-center" size="auto">
-              <ion-button
-                (click)="addRecipeToMealPlan()"
-                fill="clear"
-                size="small"
-              >
-                <ion-icon name="calendar-outline" slot="start"></ion-icon>
-                {{ "pages.recipeDetails.addToMealPlan" | translate }}
-              </ion-button>
-            </ion-col>
-            <ion-col class="ion-text-center" size="auto">
               <ion-button (click)="printRecipe()" fill="clear" size="small">
                 <ion-icon name="print-outline" slot="start"></ion-icon>
                 {{ "pages.recipeDetails.print" | translate }}
@@ -877,26 +912,6 @@
             <ion-button (click)="deleteRecipe()" fill="clear" size="small">
               <ion-icon name="trash-outline" slot="start"></ion-icon>
               {{ "pages.recipeDetails.delete" | translate }}
-            </ion-button>
-          </ion-col>
-          <ion-col class="ion-text-center" size="auto">
-            <ion-button
-              (click)="addRecipeToShoppingList()"
-              fill="clear"
-              size="small"
-            >
-              <ion-icon name="list-outline" slot="start"></ion-icon>
-              {{ "pages.recipeDetails.addToShoppingList" | translate }}
-            </ion-button>
-          </ion-col>
-          <ion-col class="ion-text-center" size="auto">
-            <ion-button
-              (click)="addRecipeToMealPlan()"
-              fill="clear"
-              size="small"
-            >
-              <ion-icon name="calendar-outline" slot="start"></ion-icon>
-              {{ "pages.recipeDetails.addToMealPlan" | translate }}
             </ion-button>
           </ion-col>
           <ion-col class="ion-text-center" size="auto">

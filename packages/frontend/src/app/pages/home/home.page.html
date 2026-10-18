@@ -82,7 +82,13 @@
 </ion-header>
 
 <ion-content>
-  <div class="homegrid" [ngClass]="{ 'no-search': folder !== 'main' }">
+  <div
+    class="homegrid"
+    [ngClass]="{
+      'no-search': folder !== 'main',
+      'tiles-view': preferences[preferenceKeys.ViewType] === 'tiles',
+    }"
+  >
     @if (folder === "main") {
       <div class="search-container">
         <ion-searchbar
@@ -100,6 +106,7 @@
           class="search-filter"
           (click)="showSearchFilter($event)"
         >
+          <ion-icon name="funnel-outline" slot="start"></ion-icon>
           {{ "pages.home.search.filter" | translate }}
         </ion-button>
       </div>
@@ -121,7 +128,11 @@
           </div>
         }
         <div *uiScroll="let recipeGroup of datasource" class="recipe-group-row">
-          <div class="recipe-group" [class.single-col]="tileColCount === 1">
+          <div
+            class="recipe-group"
+            [class.single-col]="tileColCount === 1"
+            [style.--tile-cols]="tileColCount"
+          >
             @for (recipe of recipeGroup; track recipe.id) {
               <div
                 class="recipe-card"

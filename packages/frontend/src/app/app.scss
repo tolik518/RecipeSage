@@ -421,3 +421,14 @@ ion-modal.alert-modal {
     }
   }
 }
+
+// Side menu: mark the page you are on (the menu stays open on wide screens)
+ion-menu ion-item.nav-active {
+  --background: rgba(var(--ion-color-primary-rgb), 0.1);
+  --color: var(--ion-color-primary);
+  font-weight: 600;
+
+  ion-icon {
+    color: var(--ion-color-primary);
+  }
+}

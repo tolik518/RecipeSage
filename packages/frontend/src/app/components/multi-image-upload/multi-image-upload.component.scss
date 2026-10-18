@@ -96,3 +96,18 @@
     }
   }
 }
+
+// Wide screens: larger previews, so the photo can actually be judged
+@media only screen and (min-width: 641px) {
+  .recipe-image .image-frame {
+    width: 280px;
+    height: 280px;
+    border-radius: 12px;
+
+    img {
+      width: 280px;
+      height: 280px;
+      border-radius: 12px;
+    }
+  }
+}

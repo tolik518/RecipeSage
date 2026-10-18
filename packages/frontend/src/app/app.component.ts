@@ -763,6 +763,14 @@ export class AppComponent {
       [/^\/(people|settings|labels)$/, "more"],
     ];
 
+  // Highlights the current page in the side menu (always visible on wide screens)
+  isNavActive(navItem: { id: string; url: string }): boolean {
+    const path = this.router.url.split("?")[0];
+    if (path === navItem.url || path.startsWith(`${navItem.url}/`)) return true;
+    // Recipe pages belong to "My recipes"
+    return navItem.id === "home" && path.startsWith("/recipe/");
+  }
+
   updateTabBar(url = this.router.url) {
     const path = url.split("?")[0];
     const match = AppComponent.TAB_BAR_PAGES.find(([pattern]) =>

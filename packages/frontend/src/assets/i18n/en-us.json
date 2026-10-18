@@ -346,6 +346,7 @@
   "pages.recipeDetails.actionBar.mealPlan": "Meal plan",
   "pages.recipeDetails.actionBar.cookMode": "Cook mode",
   "pages.recipeDetails.actionBar.more": "More",
+  "pages.recipeDetails.actionBar.edit": "Edit",
   "pages.recipeDetails.share": "Share",
   "pages.recipeDetails.print": "Print",
   "pages.recipeDetails.makeACopy": "Make a Copy",
@@ -710,6 +711,7 @@
   "pages.mealPlans.metadata.youOwn": "You own this meal plan",
   "pages.mealPlans.noPlans": "You have no meal plans.",
   "pages.mealPlans.toCreate": "To create a meal plan, press the plus button in the bottom corner.",
+  "pages.mealPlans.create": "New meal plan",
 
   "pages.newMealPlanItemModal.title.update": "Update Meal Plan Item",
   "pages.newMealPlanItemModal.title.new": "Add Meal Plan Item",
@@ -2095,6 +2097,7 @@
   "pages.shoppingLists.owner": "You own this list",
   "pages.shoppingLists.nullState.1": "You have no shopping lists.",
   "pages.shoppingLists.nullState.2": "To create a shopping list, press the plus button in the bottom corner.",
+  "pages.shoppingLists.nullState.create": "New shopping list",
 
   "pages.shoppingListIgnoreModal.title": "Shopping List Item Ignore List",
   "pages.shoppingListIgnoreModal.description": "Items listed here will be automatically excluded when adding a recipe to a shopping list. This is particularly handy for ingredients such as salt, which you likely don't need added every time you add an item to a shopping list.",

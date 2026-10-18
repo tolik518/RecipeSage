@@ -86,9 +86,12 @@
           ></ion-icon>
           <ion-label virtualSlot="body">
             <p>
-              {{ "pages.mealPlans.noPlans" | translate }}<br />
-              {{ "pages.mealPlans.toCreate" | translate }}
+              {{ "pages.mealPlans.noPlans" | translate }}
             </p>
+            <ion-button class="null-state-create" (click)="newMealPlan()">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              {{ "pages.mealPlans.create" | translate }}
+            </ion-button>
           </ion-label>
         </null-state>
       }

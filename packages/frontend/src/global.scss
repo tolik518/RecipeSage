@@ -109,3 +109,8 @@ ion-searchbar input::-webkit-search-cancel-button {
 ion-app.tab-bar-visible ion-menu-button {
   display: none;
 }
+
+// Empty states get a real "create" button (instead of pointing at the "+" in the corner)
+.null-state-create {
+  margin-top: 16px;
+}

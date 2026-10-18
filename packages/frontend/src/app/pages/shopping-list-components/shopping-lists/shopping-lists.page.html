@@ -111,9 +111,12 @@
           ></ion-icon>
           <ion-label virtualSlot="body">
             <p>
-              {{ "pages.shoppingLists.nullState.1" | translate }}<br />
-              {{ "pages.shoppingLists.nullState.2" | translate }}
+              {{ "pages.shoppingLists.nullState.1" | translate }}
             </p>
+            <ion-button class="null-state-create" (click)="newShoppingList()">
+              <ion-icon name="add-outline" slot="start"></ion-icon>
+              {{ "pages.shoppingLists.nullState.create" | translate }}
+            </ion-button>
           </ion-label>
         </null-state>
       }

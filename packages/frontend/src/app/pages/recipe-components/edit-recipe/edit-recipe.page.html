@@ -148,9 +148,12 @@
       </ng-template>
     </alert-modal>
 
-    <br />
-    <br />
-    <br />
+    <!-- Room below the clip options button (only shown for new recipes) -->
+    @if (!recipe.id) {
+      <br />
+      <br />
+      <br />
+    }
     <text-input
       class="recipe-input"
       label="{{ 'pages.editRecipe.input.title' | translate }}"

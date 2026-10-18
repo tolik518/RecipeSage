@@ -43,7 +43,8 @@ export class PreferencesService {
   preferences: AppPreferenceTypes = {
     preferencesVersion: 0,
 
-    [GlobalPreferenceKey.EnableSplitPane]: false,
+    // Wide screens show the side menu permanently (there is no tab bar there)
+    [GlobalPreferenceKey.EnableSplitPane]: true,
     [GlobalPreferenceKey.Language]: null,
     [GlobalPreferenceKey.FontSize]: SupportedFontSize.X1_0,
     [GlobalPreferenceKey.Theme]: AppTheme.Default,

@@ -219,3 +219,92 @@ ion-button.search-filter {
   min-height: 44px;
   margin: 0;
 }
+
+// ---- Wide screens -------------------------------------------------------
+// Search, label filter and recipes line up in one centered column: as wide as
+// a readable list in the list views, wider for the tile grid.
+$tile-grid-max-width: 1400px; // TILE_GRID_MAX_WIDTH in home.page.ts
+
+@media only screen and (max-width: ($desktop-breakpoint - 1px)) {
+  ion-button.search-filter ion-icon {
+    display: none;
+  }
+}
+
+@media only screen and (min-width: $desktop-breakpoint) {
+  .search-container,
+  .labelChips,
+  recipe-list-item {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: var(--page-max-width);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .tiles-view {
+    .search-container,
+    .labelChips {
+      max-width: $tile-grid-max-width;
+    }
+  }
+
+  .search-container {
+    gap: 4px;
+    padding-inline-end: 10px;
+  }
+
+  ion-button.search-filter::part(native) {
+    padding: 0 14px;
+    border: 1px solid
+      var(--ion-border-color, rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.15));
+    border-radius: 10px;
+  }
+
+  // Tiles: an even grid whose columns stretch to fill the row, instead of
+  // fixed-width tiles spread out with uneven gaps (the last row stays left)
+  .recipe-group {
+    display: grid;
+    grid-template-columns: repeat(var(--tile-cols, 1), minmax(0, 1fr));
+    gap: 20px;
+    max-width: $tile-grid-max-width;
+    margin: 0 auto;
+
+    .recipe-card {
+      width: auto;
+      height: auto;
+      border-radius: 12px;
+      transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease;
+
+      img {
+        display: block;
+        width: 100%;
+        height: auto;
+        aspect-ratio: 1;
+      }
+
+      img.no-image {
+        padding: 28%;
+      }
+
+      // Same text area height on every tile, so all rows line up
+      .recipe-card-content {
+        box-sizing: border-box;
+        height: var(--content-height);
+      }
+
+      &:not(.showImage) .recipe-card-content {
+        height: calc(var(--content-height) + 1.25rem);
+      }
+    }
+  }
+
+  @media (hover: hover) {
+    .recipe-group .recipe-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18);
+    }
+  }
+}

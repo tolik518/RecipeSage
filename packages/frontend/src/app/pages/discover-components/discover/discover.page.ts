@@ -176,7 +176,7 @@ export class DiscoverPage {
   private computeTileColCount(): boolean {
     const isSidebarEnabled =
       this.preferences[GlobalPreferenceKey.EnableSplitPane];
-    const isSidebarOpen = window.innerWidth >= 1200;
+    const isSidebarOpen = window.innerWidth >= 1024; // split pane "when" in app.component.html
     const sidebarWidth = isSidebarEnabled && isSidebarOpen ? 300 : 0;
     const pageWidth = window.innerWidth - sidebarWidth;
     const tileColCount = Math.max(

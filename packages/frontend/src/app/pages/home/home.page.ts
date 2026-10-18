@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy } from "@angular/core";
+import { Component, ElementRef, inject, OnDestroy } from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
 import {
@@ -70,6 +70,11 @@ import { addIcons } from "ionicons";
 const TILE_WIDTH = 200;
 const TILE_PADD = 20;
 const MOBILE_TWO_COLUMN_MIN_WIDTH = 375;
+// Wide screens: tiles stretch to fill a centered grid of at most this width
+// (keep in sync with $tile-grid-max-width in home.page.scss)
+const TILE_GRID_MAX_WIDTH = 1400;
+// Split pane "when" in app.component.html
+const SPLIT_PANE_MIN_WIDTH = 1024;
 
 @Component({
   standalone: true,
@@ -115,6 +120,7 @@ export class HomePage implements OnDestroy {
   private serverActionsService = inject(ServerActionsService);
   private utilService = inject(UtilService);
   private cookingToolbarService = inject(CookingToolbarService);
+  private elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
 
   defaultBackHref: string = RouteMap.PeoplePage.getPath();
   aboutHref: string = RouteMap.AboutPage.getPath();
@@ -260,7 +266,7 @@ export class HomePage implements OnDestroy {
     window.addEventListener("resize", this.onWindowResize);
     this.events.subscribe(
       EventName.ApplicationSplitPaneChanged,
-      this.updateTileColCount,
+      this.onWindowResize,
     );
     this.updateTileColCount();
 
@@ -301,7 +307,7 @@ export class HomePage implements OnDestroy {
     window.removeEventListener("resize", this.onWindowResize);
     this.events.unsubscribe(
       EventName.ApplicationSplitPaneChanged,
-      this.updateTileColCount,
+      this.onWindowResize,
     );
     if (this.resizeFrame !== null) {
       cancelAnimationFrame(this.resizeFrame);
@@ -374,12 +380,24 @@ export class HomePage implements OnDestroy {
     }
   }
 
-  updateTileColCount = () => {
+  // Width the page's content actually gets (the side menu may take part of the window)
+  private getHomePageWidth(): number {
+    const measured =
+      this.elementRef.nativeElement.querySelector("ion-content")?.clientWidth;
+    if (measured) return measured;
+
     const isSidebarEnabled =
       this.preferences[GlobalPreferenceKey.EnableSplitPane];
-    const isSidebarOpen = window.innerWidth >= 1200;
+    const isSidebarOpen = window.innerWidth >= SPLIT_PANE_MIN_WIDTH;
     const sidebarWidth = isSidebarEnabled && isSidebarOpen ? 300 : 0;
-    const homePageWidth = window.innerWidth - sidebarWidth;
+    return window.innerWidth - sidebarWidth;
+  }
+
+  updateTileColCount = () => {
+    const homePageWidth = Math.min(
+      this.getHomePageWidth(),
+      TILE_GRID_MAX_WIDTH,
+    );
     const minimumColumnCount =
       homePageWidth >= MOBILE_TWO_COLUMN_MIN_WIDTH ? 2 : 1;
     const tileColCount = Math.max(

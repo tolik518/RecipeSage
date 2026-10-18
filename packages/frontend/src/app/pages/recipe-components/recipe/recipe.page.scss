@@ -1,8 +1,10 @@
 @import "../../../../theme/shared-variables.scss";
 
 .page-wrapper {
-  max-width: 1250px;
+  max-width: var(--wide-page-max-width);
   margin: 0 auto;
+  // The header layout follows the space the page gets (the side menu may take some)
+  container-type: inline-size;
 }
 
 @media only screen and (max-width: $desktop-breakpoint) {
@@ -96,15 +98,17 @@ h2.recipeTitle {
     }
   }
 
+  // Wide screens: ingredients get a third of the width and stay in view while
+  // scrolling through the steps (scrolling on their own if they are longer)
   @media (min-width: 1000px) {
     .ingredientsCol {
-      width: 275px;
-    }
-  }
-
-  @media (min-width: 1200px) {
-    .ingredientsCol {
-      width: 325px;
+      width: 34%;
+      position: sticky;
+      top: 0;
+      align-self: flex-start;
+      max-height: calc(100vh - 72px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
     }
   }
 }
@@ -373,5 +377,53 @@ ion-item:has(> ion-icon) > ion-label.section-title p {
 @media only screen and (min-width: $desktop-breakpoint) {
   .recipe-action-bar {
     display: none;
+  }
+}
+
+// ---- Wide screens -------------------------------------------------------
+.recipe-quick-actions {
+  display: none;
+}
+
+@media only screen and (min-width: $desktop-breakpoint) {
+  .recipe-header {
+    padding: 0 16px;
+
+    // Line the photo and the text up on the same edge
+    .recipe-header__info ion-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+    }
+  }
+
+  .recipe-quick-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 12px 0 4px;
+
+    ion-button {
+      margin: 0;
+      --border-radius: 10px;
+      --padding-start: 12px;
+      --padding-end: 12px;
+    }
+  }
+}
+
+// Photo beside the title instead of above it
+@container (min-width: 840px) {
+  .recipe-header.has-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 32px;
+    align-items: start;
+    margin-bottom: 16px;
+
+    .recipe-hero {
+      max-width: none;
+      margin: 0;
+    }
   }
 }
