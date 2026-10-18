@@ -90,6 +90,7 @@ import {
   trashOutline,
 } from "ionicons/icons";
 import { addIcons } from "ionicons";
+import { resolveStorageLocation } from "../../../utils/resolveStorageLocation";
 
 @Component({
   standalone: true,
@@ -552,7 +553,7 @@ export class RecipePage {
     if (!this.recipe) return [];
     return [...this.recipe.recipeImages]
       .sort((a, b) => a.order - b.order)
-      .map((ri) => ({ url: ri.image.location }));
+      .map((ri) => ({ url: resolveStorageLocation(ri.image.location) }));
   }
 
   editRecipe() {
@@ -659,7 +660,7 @@ export class RecipePage {
       notes: this.recipe.notes,
       ingredients: this.recipe.ingredients,
       instructions: this.recipe.instructions,
-      rating: this.recipe.rating,
+      rating: this.recipe.rating || null,
       folder: this.recipe.folder as "main" | "inbox",
       imageIds: this.recipe.recipeImages.map((ri) => ri.image.id),
       labelIds: this.recipe.recipeLabels.map((rl) => rl.label.id),
@@ -687,6 +688,7 @@ export class RecipePage {
       componentProps: {
         recipes: [this.recipe],
         scale: this.scale,
+        unitSystem: this.unitSystem,
       },
     });
 
@@ -710,6 +712,7 @@ export class RecipePage {
       componentProps: {
         recipe: this.recipe,
         scale: this.scale,
+        unitSystem: this.unitSystem,
       },
     });
 
@@ -743,7 +746,7 @@ export class RecipePage {
       notes: this.recipe.notes,
       ingredients: this.recipe.ingredients,
       instructions: this.recipe.instructions,
-      rating: this.recipe.rating,
+      rating: this.recipe.rating || null,
       folder: folderName,
       labelIds: this.recipe.recipeLabels.map(
         (recipeLabel) => recipeLabel.label.id,
@@ -780,7 +783,7 @@ export class RecipePage {
       notes: this.recipe.notes,
       ingredients: this.recipe.ingredients,
       instructions: this.recipe.instructions,
-      rating: this.recipe.rating,
+      rating: this.recipe.rating || null,
       folder: this.recipe.folder as "main" | "inbox",
       labelIds,
       imageIds: this.recipe.recipeImages.map(

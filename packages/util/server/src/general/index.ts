@@ -6,6 +6,11 @@ export * from "./auth/validatePasswordHash";
 export * from "./auth/sanitizeUserEmail";
 export * from "./auth/redirectGoogleAuthCode";
 export * from "./auth/redirectAppleAuthCode";
+export * from "./auth/getAppleClientSecret";
+export * from "./auth/encryptRedirectAppleRefreshToken";
+export * from "./auth/decryptRedirectAppleRefreshToken";
+export * from "./auth/saveAppleAuthToken";
+export * from "./auth/revokeAppleAuthTokens";
 
 export * from "./categorize/getShoppingListItemCategories";
 export * from "./categorize/getShoppingListItemGroupTitles";
@@ -15,6 +20,7 @@ export * from "./email/sendPasswordResetEmail";
 export * from "./jobs/getJobResultCode";
 export * from "./jobs/importJobFinishCommon";
 export * from "./jobs/importJobSetupCommon";
+export * from "./jobs/markJobFailed";
 
 export * from "./metrics";
 
@@ -27,6 +33,7 @@ export * from "./rateLimit/resolveClientIp";
 export * from "./credits";
 export * from "./clip";
 export * from "./sortRecipeImages";
+export * from "./resolveStorageLocationToPublicUrl";
 export * from "./fileTransformer";
 export * from "./config";
 export * from "./grip";
@@ -34,6 +41,7 @@ export * from "./firebaseAdmin";
 export * from "./firebase";
 export * from "./dispatchMessageNotification";
 export * from "./fetch";
+export * from "./FetchTimeoutError";
 export * from "./fetchURLError";
 export * from "./fetchBufferViaScrapfly";
 export * from "./ScrapflyError";

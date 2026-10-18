@@ -121,3 +121,8 @@ ion-popover.rs-menu-popover {
   --border-radius: 12px;
   --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
 }
+
+.autoTextDirection {
+  unicode-bidi: plaintext;
+  text-align: start;
+}

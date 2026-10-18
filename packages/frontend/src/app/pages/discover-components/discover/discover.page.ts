@@ -6,6 +6,7 @@ import { Datasource, UiScrollModule } from "ngx-ui-scroll";
 import {
   MyRecipesPreferenceKey,
   GlobalPreferenceKey,
+  SEARCH_TERM_LENGTH_LIMIT,
 } from "@recipesage/util/shared";
 
 import { RouteMap, UtilService } from "../../../services/util.service";
@@ -88,6 +89,7 @@ export class DiscoverPage {
   languageOptions: DiscoverLanguageOption[] = [];
 
   searchTerm = "";
+  readonly searchTermMaxLength = SEARCH_TERM_LENGTH_LIMIT;
   selectedLanguages: string[] = [];
   selectedCategories: string[] = [];
   matchAllCategories = false;
@@ -318,9 +320,11 @@ export class DiscoverPage {
     return response.recipes.length > 0;
   }
 
-  openRecipe(recipe: DiscoverRecipeSummary) {
-    this.navCtrl.navigateForward(
+  openRecipe(recipe: DiscoverRecipeSummary, event: MouseEvent) {
+    this.utilService.navigateForwardOrOpenWindow(
+      this.navCtrl,
       RouteMap.DiscoverRecipePage.getPath(recipe.id),
+      event,
     );
   }
 }

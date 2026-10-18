@@ -45,6 +45,7 @@ import {
 } from "@recipesage/util/shared";
 import { System } from "@recipesage/unitz-ts";
 import { linkifyHtml } from "../../../utils/linkify";
+import { getShareLinkOrigin } from "../../../utils/serverConfig";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { RatingComponent } from "../../../components/rating/rating.component";
 import {
@@ -76,6 +77,7 @@ import {
   pricetagOutline,
 } from "ionicons/icons";
 import { addIcons } from "ionicons";
+import { resolveStorageLocation } from "../../../utils/resolveStorageLocation";
 
 type DiscoverRecipeDetail = RouterOutputs["discover"]["getDiscoverRecipe"];
 
@@ -326,7 +328,7 @@ export class DiscoverRecipePage {
         order: discoverRecipeImage.order,
       }))
       .sort((a, b) => a.order - b.order)
-      .map((image) => ({ url: image.url }));
+      .map((image) => ({ url: resolveStorageLocation(image.url) }));
 
     const decimalNotationMode = inferRecipeNotation(
       this.recipe,
@@ -415,7 +417,7 @@ export class DiscoverRecipePage {
     if (!this.recipe) return;
 
     const url =
-      window.location.origin +
+      getShareLinkOrigin() +
       "/app" +
       RouteMap.DiscoverRecipePage.getPath(this.recipe.id);
 

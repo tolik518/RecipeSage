@@ -62,7 +62,7 @@
             <!-- RECIPIENT -->
             @if (message.recipe) {
               <ion-item
-                (click)="openRecipe(message.recipe)"
+                (click)="openRecipe(message.recipe, $event)"
                 lines="none"
                 button="true"
               >
@@ -72,7 +72,10 @@
                 ) {
                   <ion-avatar slot="start">
                     <img
-                      src="{{ message.recipe.recipeImages[0].image.location }}"
+                      src="{{
+                        message.recipe.recipeImages[0].image.location
+                          | resolveStorageLocation
+                      }}"
                     />
                   </ion-avatar>
                 }
@@ -111,7 +114,7 @@
             <!-- SENDER -->
             @if (message.recipe) {
               <ion-item
-                (click)="openRecipe(message.recipe)"
+                (click)="openRecipe(message.recipe, $event)"
                 lines="none"
                 button="true"
               >
@@ -121,7 +124,10 @@
                 ) {
                   <ion-avatar slot="start">
                     <img
-                      src="{{ message.recipe.recipeImages[0].image.location }}"
+                      src="{{
+                        message.recipe.recipeImages[0].image.location
+                          | resolveStorageLocation
+                      }}"
                     />
                   </ion-avatar>
                 }

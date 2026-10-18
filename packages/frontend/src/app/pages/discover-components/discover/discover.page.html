@@ -22,6 +22,7 @@
         enterkeyhint="search"
         inputmode="search"
         type="search"
+        [attr.maxlength]="searchTermMaxLength"
         (ionClear)="onSearchChange('')"
         (keydown.enter)="searchFieldEnter($event)"
       ></ion-searchbar>
@@ -40,13 +41,20 @@
       <div *uiScroll="let recipeGroup of datasource" class="recipe-group-row">
         <div class="recipe-group" [class.single-col]="tileColCount === 1">
           @for (recipe of recipeGroup; track recipe.id) {
-            <div class="recipe-card" (click)="openRecipe(recipe)" button>
+            <div
+              class="recipe-card"
+              (click)="openRecipe(recipe, $event)"
+              button
+            >
               @if (recipe.discoverRecipeImages.length) {
                 <img
                   loading="lazy"
                   decoding="async"
                   [alt]="recipe.title"
-                  [src]="recipe.discoverRecipeImages[0].image.location"
+                  [src]="
+                    recipe.discoverRecipeImages[0].image.location
+                      | resolveStorageLocation
+                  "
                 />
               } @else {
                 <img
@@ -93,13 +101,16 @@
 
     @if (recipes.length && preferences[preferenceKeys.ViewType] !== "tiles") {
       <div *uiScroll="let recipe of datasource" class="recipe-item" button>
-        <div class="recipe-item-clickable" (click)="openRecipe(recipe)">
+        <div class="recipe-item-clickable" (click)="openRecipe(recipe, $event)">
           @if (recipe.discoverRecipeImages.length) {
             <img
               loading="lazy"
               decoding="async"
               [alt]="recipe.title"
-              [src]="recipe.discoverRecipeImages[0].image.location"
+              [src]="
+                recipe.discoverRecipeImages[0].image.location
+                  | resolveStorageLocation
+              "
             />
           } @else {
             <img

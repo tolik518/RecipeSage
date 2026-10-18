@@ -2,6 +2,8 @@ import { Component, inject } from "@angular/core";
 
 import { RouteMap, UtilService } from "../../../services/util.service";
 import { ImportService } from "../../../services/import.service";
+import { ThirdPartyAiConsentService } from "../../../services/third-party-ai-consent.service";
+import { PendingShareService } from "../../../services/pending-share.service";
 import { AlertController, NavController } from "@ionic/angular/standalone";
 import { TranslateService } from "@ngx-translate/core";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
@@ -19,6 +21,18 @@ import {
 } from "@ionic/angular/standalone";
 
 const MAX_FILE_SIZE_MB = 3000;
+
+const DOCUMENT_FILE_EXTENSIONS = [
+  ".txt",
+  ".rtf",
+  ".odt",
+  ".docx",
+  ".md",
+  ".markdown",
+  ".html",
+  ".htm",
+  ".org",
+];
 
 @Component({
   standalone: true,
@@ -41,10 +55,12 @@ const MAX_FILE_SIZE_MB = 3000;
 })
 export class ImportTextfilesPage {
   private importService = inject(ImportService);
+  private thirdPartyAiConsentService = inject(ThirdPartyAiConsentService);
   private utilService = inject(UtilService);
   private alertCtrl = inject(AlertController);
   private translate = inject(TranslateService);
   private navCtrl = inject(NavController);
+  private pendingShareService = inject(PendingShareService);
 
   defaultBackHref: string = RouteMap.ImportPage.getPath();
 
@@ -81,8 +97,24 @@ export class ImportTextfilesPage {
     return !this.file.name.toLowerCase().endsWith(".zip");
   }
 
-  async submit() {
+  isSingleDocument() {
+    if (!this.file) return false;
+    const fileName = this.file.name.toLowerCase();
+    return DOCUMENT_FILE_EXTENSIONS.some((extension) =>
+      fileName.endsWith(extension),
+    );
+  }
+
+  async createRecipeFromDocument() {
     if (!this.file) return;
+
+    this.pendingShareService.set({ kind: "document", file: this.file });
+    await this.navCtrl.navigateForward(RouteMap.EditRecipePage.getPath("new"));
+  }
+
+  async submit() {
+    if (!this.file || this.isSingleDocument()) return;
+    if (!(await this.thirdPartyAiConsentService.ensureConsent())) return;
 
     const response = await this.importService.importTextfiles(
       this.file,

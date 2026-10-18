@@ -99,6 +99,8 @@ export class MealPlanItemDetailsModalPage {
   mealItem!: MealPlanItemSummary;
   @Input() customMealOptions: string | null = null;
 
+  modal?: HTMLIonModalElement;
+
   parsedNotes: ReturnType<typeof parseNotes> = [];
 
   ngOnInit() {
@@ -115,12 +117,10 @@ export class MealPlanItemDetailsModalPage {
     }
   }
 
-  openRecipe() {
+  openRecipe(event: MouseEvent) {
     if (!this.mealItem.recipe) return;
 
-    this.navCtrl.navigateForward(
-      RouteMap.RecipePage.getPath(this.mealItem.recipe.id),
-    );
+    this.utilService.openRecipe(this.navCtrl, this.mealItem.recipe.id, event);
     this.close();
   }
 
@@ -285,6 +285,6 @@ export class MealPlanItemDetailsModalPage {
   }
 
   close(args?: any) {
-    this.modalCtrl.dismiss(args);
+    this.modal?.dismiss(args);
   }
 }

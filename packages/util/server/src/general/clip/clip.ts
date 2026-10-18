@@ -1,8 +1,8 @@
 import { createHash } from "crypto";
-import { AbortError } from "node-fetch";
 import * as Sentry from "@sentry/node";
 import { Prisma, prisma } from "@recipesage/prisma";
 import { fetchURL } from "../fetch";
+import { FetchTimeoutError } from "../FetchTimeoutError";
 import { StandardizedRecipeImportEntry } from "../../db";
 import { metrics } from "../metrics";
 import {
@@ -16,12 +16,14 @@ import {
   extractPageText,
   PageText,
 } from "./htmlExtract";
+import { cleanRecipeFields } from "./cleanRecipeFields";
 import { htmlmetaparserToRecipe } from "./htmlmetaparserToRecipe";
 import { isRecipeGrounded } from "./isRecipeGrounded";
 import { normalizeClipUrl } from "./normalizeClipUrl";
 import type { Result } from "htmlmetaparser";
 
 const CLIP_CACHE_VERSION = 1;
+const NULL_CHAR = "\u0000";
 
 const hashUrl = (url: string) => createHash("sha256").update(url).digest();
 
@@ -154,7 +156,7 @@ export const clipUrl = async (
       timeout,
     });
   })().catch((e) => {
-    if (e instanceof AbortError) {
+    if (e instanceof FetchTimeoutError) {
       metrics.clipError.inc({
         form: "url",
         method: "timeout",
@@ -227,6 +229,7 @@ export const clipUrl = async (
       method: "pdf",
     });
 
+    result.recipe = cleanRecipeFields(result.recipe);
     result.recipe.url = normalizedUrl;
 
     if (isCompleteRecipe(result)) await cacheResult(result);
@@ -267,6 +270,7 @@ export const clipUrl = async (
       method: "image",
     });
 
+    result.recipe = cleanRecipeFields(result.recipe);
     result.recipe.url = normalizedUrl;
     result.images.push(normalizedUrl);
 
@@ -287,10 +291,11 @@ export const clipUrl = async (
 };
 
 export const clipHtml = async (
-  htmlDocument: string,
+  rawHtmlDocument: string,
   url?: string,
   captureError?: (method: string, error: unknown) => void,
 ): Promise<StandardizedRecipeImportEntry> => {
+  const htmlDocument = rawHtmlDocument.replaceAll(NULL_CHAR, "");
   const form = url ? "url" : "html";
 
   if (!url) {
@@ -405,16 +410,22 @@ export const clipHtml = async (
 
         if (!result) continue;
 
+        result.recipe = cleanRecipeFields(result.recipe);
+
+        const hasContent = !!(
+          result.recipe.ingredients || result.recipe.instructions
+        );
         const usable = !!(
           result.recipe.ingredients && result.recipe.instructions
         );
-        const grounded = isRecipeGrounded(result.recipe, getPageText().text);
+        const grounded =
+          hasContent && isRecipeGrounded(result.recipe, getPageText().text);
 
         if (usable && grounded) {
           return [name, result];
         }
 
-        if (name === "llm" && !grounded) {
+        if (name === "llm" && hasContent && !grounded) {
           metrics.clipUngrounded.inc({
             form,
           });

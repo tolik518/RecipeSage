@@ -184,6 +184,16 @@ const connect = () => {
   ];
 
   const dbP = openDB<RSLocalDB>(`localDb`, migrations.length, {
+    terminated: () => {
+      console.error(
+        "Local DB connection was terminated by the browser. Reconnecting on next use.",
+      );
+      Sentry.captureMessage("Local DB connection was terminated", {
+        level: "warning",
+      });
+
+      if (localDbP === dbP) localDbP = undefined;
+    },
     blocking: async () => {
       dbP.then((db) => {
         db.close();
@@ -196,7 +206,9 @@ const connect = () => {
           self.registration instanceof ServiceWorkerRegistration
         ) {
           // We're in a service worker
-          self.registration.update();
+          self.registration.update().catch((e) => {
+            console.error("Failed to check for service worker update", e);
+          });
         } else {
           // We're in a window
           const messages = getLocalDbUpgradeMessages();

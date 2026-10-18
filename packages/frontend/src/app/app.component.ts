@@ -48,6 +48,8 @@ import { ServerActionsService } from "./services/server-actions.service";
 import { SyncService } from "./services/sync.service";
 import { appIdbStorageManager } from "./utils/appIdbStorageManager";
 import { getRoutePattern } from "./utils/getRoutePattern";
+import { getElectronAPI } from "./utils/electron";
+import { showLocalNotification } from "./utils/showLocalNotification";
 import { SHARED_UI_IMPORTS } from "./providers/shared-ui.provider";
 import { CookingToolbarComponent } from "./components/cooking-toolbar/cooking-toolbar.component";
 import { VersionCheckService } from "./services/versioncheck.service";
@@ -245,6 +247,8 @@ export class AppComponent {
       this.messagingService.requestNotifications();
     }
 
+    this.initDesktopNotifications();
+
     this.updateNavList();
     this.updateIsLoggedIn();
     this.migrateSession();
@@ -315,7 +319,20 @@ export class AppComponent {
   initUpdateListeners() {
     (window as any).appLoaded = true;
 
-    (window as any).swRegistration?.update();
+    (window as any).swRegistration?.update()?.catch((e: unknown) => {
+      console.error("Failed to check for service worker update", e);
+    });
+  }
+
+  private initDesktopNotifications() {
+    const electronAPI = getElectronAPI();
+    if (!electronAPI) return;
+
+    electronAPI.onNotificationClick((route) => {
+      this.ngZone.run(() => {
+        void this.router.navigateByUrl(route);
+      });
+    });
   }
 
   initEventListeners() {
@@ -376,6 +393,16 @@ export class AppComponent {
         ],
       });
       toast.present();
+
+      if (!document.hasFocus()) {
+        showLocalNotification({
+          title: payload.otherUser.name,
+          body: payload.recipe ? payload.recipe.title : payload.body,
+          route: RouteMap.MessageThreadPage.getPath(payload.otherUser.id),
+          tag: `messages:new-${payload.otherUser.id}`,
+          skipWhenHidden: true,
+        });
+      }
     });
   }
 
@@ -739,23 +766,7 @@ export class AppComponent {
 
   async migrateSession() {
     try {
-      const token = localStorage.getItem("token");
-      if (!token) return;
-
-      const currentIdbSession = await appIdbStorageManager.getSession();
-      if (currentIdbSession) return;
-
-      const me = await this.trpcService.trpc.users.getMe
-        .query()
-        .catch(() => undefined);
-
-      if (!me) return;
-
-      await appIdbStorageManager.setSession({
-        userId: me.id,
-        email: me.email,
-        token,
-      });
+      await appIdbStorageManager.restoreSessionFromToken();
     } catch (e) {
       Sentry.captureException(e);
     }

@@ -8,6 +8,7 @@ import {
 import { NavController } from "@ionic/angular/standalone";
 import dayjs from "dayjs";
 import { serverConfig, PUBLIC_WEB_ORIGIN } from "../utils/serverConfig";
+import { getIsElectron } from "../utils/electron";
 import { Capacitor } from "@capacitor/core";
 
 export interface RecipeTemplateModifiers {
@@ -26,6 +27,7 @@ export interface RecipeTemplateModifiers {
   showPrintButton?: boolean;
   print?: boolean; // Triggers immediate print
   scale?: string;
+  unitSystem?: string;
   preferredLanguage?: string;
   today?: string;
 }
@@ -247,6 +249,12 @@ export const RouteMap = {
       return `people`;
     },
     path: "people",
+  },
+  BlockedUsersPage: {
+    getPath() {
+      return `people/blocked-users`;
+    },
+    path: "people/blocked-users",
   },
   ExportPage: {
     getPath() {
@@ -735,9 +743,10 @@ export class UtilService {
   buildPublicRoutePath(routePath: string) {
     // Only the hosted donation flow reaches this (self-host redirects to
     // recipesage.com to donate), so native always resolves to the hosted origin.
-    const origin = Capacitor.isNativePlatform()
-      ? PUBLIC_WEB_ORIGIN
-      : window.location.origin;
+    const origin =
+      Capacitor.isNativePlatform() || getIsElectron()
+        ? PUBLIC_WEB_ORIGIN
+        : window.location.origin;
     return `${origin}/app/${routePath}`;
   }
 
@@ -754,10 +763,22 @@ export class UtilService {
     recipeId: string,
     event?: MouseEvent | KeyboardEvent,
   ) {
+    this.navigateForwardOrOpenWindow(
+      navCtrl,
+      RouteMap.RecipePage.getPath(recipeId),
+      event,
+    );
+  }
+
+  navigateForwardOrOpenWindow(
+    navCtrl: NavController,
+    path: string,
+    event?: MouseEvent | KeyboardEvent,
+  ) {
     if (event && (event.metaKey || event.ctrlKey)) {
-      window.open(`/app${RouteMap.RecipePage.getPath(recipeId)}`);
+      window.open(`/app${path}`);
       return;
     }
-    navCtrl.navigateForward(RouteMap.RecipePage.getPath(recipeId));
+    navCtrl.navigateForward(path);
   }
 }

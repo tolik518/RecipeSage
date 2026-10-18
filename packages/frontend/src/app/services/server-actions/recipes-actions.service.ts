@@ -30,7 +30,9 @@ const passesNutritionFilter = (
     passesNutritionRange(recipe.nutritionCalories, filter.calories) &&
     passesNutritionRange(recipe.nutritionProtein, filter.protein) &&
     passesNutritionRange(recipe.nutritionTotalCarbs, filter.totalCarbs) &&
+    passesNutritionRange(recipe.nutritionDietaryFiber, filter.dietaryFiber) &&
     passesNutritionRange(recipe.nutritionTotalFat, filter.totalFat) &&
+    passesNutritionRange(recipe.nutritionSaturatedFat, filter.saturatedFat) &&
     passesNutritionRange(recipe.nutritionSodium, filter.sodium)
   );
 };
@@ -187,7 +189,7 @@ export class RecipesActionsService extends ActionsBase {
 
         if (ratings) {
           recipes = recipes.filter((recipe) => {
-            return ratings.includes(recipe.rating);
+            return ratings.includes(recipe.rating || null);
           });
         }
 
@@ -427,7 +429,7 @@ export class RecipesActionsService extends ActionsBase {
 
         if (ratings) {
           recipes = recipes.filter((recipe) => {
-            return ratings.includes(recipe.rating);
+            return ratings.includes(recipe.rating || null);
           });
         }
 

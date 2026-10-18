@@ -16,7 +16,8 @@ import { AlertController } from "@ionic/angular/standalone";
 
 import { ServerActionsService } from "./server-actions.service";
 import { EventName, EventService } from "./event.service";
-import { RouteMap } from "./util.service";
+import { RouteMap, UtilService } from "./util.service";
+import { getIsElectron } from "../utils/electron";
 import { TranslateService } from "@ngx-translate/core";
 
 @Injectable({
@@ -26,6 +27,7 @@ export class MessagingService {
   private events = inject(EventService);
   private translate = inject(TranslateService);
   private serverActionsService = inject(ServerActionsService);
+  private utilService = inject(UtilService);
   private alertCtrl = inject(AlertController);
   private router = inject(Router);
   private ngZone = inject(NgZone);
@@ -34,6 +36,7 @@ export class MessagingService {
   private fcmToken?: string;
 
   private isNative = Capacitor.isNativePlatform();
+  private isDesktop = getIsElectron();
   private nativePermissionGranted = false;
 
   private _isFCMSupported: boolean = false;
@@ -95,6 +98,16 @@ export class MessagingService {
       },
     );
 
+    this.events.subscribe(EventName.Auth, async () => {
+      if (!this.utilService.isLoggedIn()) return;
+
+      const { receive } = await FirebaseMessaging.checkPermissions();
+      this.nativePermissionGranted = receive === "granted";
+      if (this.nativePermissionGranted) {
+        void this.updateToken();
+      }
+    });
+
     if (this.nativePermissionGranted) {
       void this.updateToken();
     }
@@ -134,8 +147,14 @@ export class MessagingService {
   private async onNativeTokenReceived(token: string) {
     if (!token) return;
     this.fcmToken = token;
+    if (!this.utilService.isLoggedIn()) return;
     try {
-      await this.serverActionsService.users.saveFCMToken({ fcmToken: token });
+      await this.serverActionsService.users.saveFCMToken(
+        { fcmToken: token },
+        {
+          "*": () => {},
+        },
+      );
     } catch (err) {
       console.log("Unable to save refreshed notification token. ", err);
     }
@@ -155,6 +174,10 @@ export class MessagingService {
   isNotificationsEnabled() {
     if (this.isNative) {
       return this._isFCMSupported && this.nativePermissionGranted;
+    }
+
+    if (this.isDesktop) {
+      return true;
     }
 
     return (
@@ -184,7 +207,10 @@ export class MessagingService {
       }
     }
 
-    if (!localStorage.getItem("notificationExplainationShown")) {
+    if (
+      Capacitor.getPlatform() !== "ios" &&
+      !localStorage.getItem("notificationExplainationShown")
+    ) {
       localStorage.setItem("notificationExplainationShown", "true");
 
       const header = await this.translate
@@ -251,9 +277,14 @@ export class MessagingService {
         console.log("Unable to delete notification token. ", err);
       }
       if (token) {
-        await this.serverActionsService.users.removeFCMToken({
-          fcmToken: token,
-        });
+        await this.serverActionsService.users.removeFCMToken(
+          {
+            fcmToken: token,
+          },
+          {
+            "*": () => {},
+          },
+        );
       }
       this.fcmToken = undefined;
       return;
@@ -262,7 +293,12 @@ export class MessagingService {
     if (!this.messaging) return;
     if (!token) return;
 
-    await this.serverActionsService.users.removeFCMToken({ fcmToken: token });
+    await this.serverActionsService.users.removeFCMToken(
+      { fcmToken: token },
+      {
+        "*": () => {},
+      },
+    );
     this.fcmToken = undefined;
   }
 
@@ -286,9 +322,16 @@ export class MessagingService {
 
       this.fcmToken = currentToken;
 
-      await this.serverActionsService.users.saveFCMToken({
-        fcmToken: currentToken,
-      });
+      if (!this.utilService.isLoggedIn()) return;
+
+      await this.serverActionsService.users.saveFCMToken(
+        {
+          fcmToken: currentToken,
+        },
+        {
+          "*": () => {},
+        },
+      );
     } catch (err) {
       console.log("Unable to get notification token. ", err);
     }
