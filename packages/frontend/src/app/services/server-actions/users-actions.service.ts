@@ -268,6 +268,15 @@ export class UsersActionsService extends ActionsBase {
     );
   }
 
+  getRegistrationStatus(
+    errorHandlers?: ErrorHandlers,
+  ): Promise<RouterOutputs["users"]["getRegistrationStatus"] | undefined> {
+    return this.passThrough(
+      () => this.trpc.users.getRegistrationStatus.query(),
+      errorHandlers,
+    );
+  }
+
   updateMyProfile(
     input: RouterInputs["users"]["updateMyProfile"],
     errorHandlers?: ErrorHandlers,

@@ -23,6 +23,7 @@ import { SignInWithAppleComponent } from "../../components/sign-in-with-apple/si
 import { LogoIconComponent } from "../../components/logo-icon/logo-icon.component";
 import { TosClickwrapAgreementComponent } from "../../components/tos-clickwrap-agreement/tos-clickwrap-agreement.component";
 import { WebsocketService } from "../../services/websocket.service";
+import { RegistrationStatusService } from "../../services/registration-status.service";
 import { TextInputComponent } from "../../components/forms/text-input/text-input.component";
 import {
   IonHeader,
@@ -75,6 +76,7 @@ export class AuthPage {
   private alertCtrl = inject(AlertController);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private registrationStatusService = inject(RegistrationStatusService);
   private serverActionsService = inject(ServerActionsService);
 
   @Input() startWithRegister?: boolean;
@@ -95,6 +97,7 @@ export class AuthPage {
   defaultBackHref: string = RouteMap.GetStartedPage.getPath();
 
   revealPassword = false;
+  registrationEnabled = true;
   loading = false;
 
   constructor() {
@@ -117,6 +120,16 @@ export class AuthPage {
   ionViewWillEnter() {
     if (typeof this.startWithRegister === "boolean")
       this.showLogin = !this.startWithRegister;
+
+    this.applyRegistrationEnabled(this.registrationStatusService.enabled);
+    this.registrationStatusService
+      .load()
+      .then((enabled) => this.applyRegistrationEnabled(enabled));
+  }
+
+  private applyRegistrationEnabled(enabled: boolean) {
+    this.registrationEnabled = enabled;
+    if (!enabled) this.showLogin = true;
   }
 
   ionViewDidEnter() {

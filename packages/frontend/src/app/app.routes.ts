@@ -1,5 +1,5 @@
 import { inject } from "@angular/core";
-import { Routes } from "@angular/router";
+import { Router, Routes } from "@angular/router";
 import { Capacitor } from "@capacitor/core";
 import { GlobalPreferenceKey, StartPageOptions } from "@recipesage/util/shared";
 
@@ -8,17 +8,23 @@ import { getIsElectron } from "./utils/electron";
 import { AuthType, RouteMap, UtilService } from "./services/util.service";
 import { PreferencesService } from "./services/preferences.service";
 import { UnsavedChangesGuardService } from "./services/unsaved-changes-guard.service";
+import { RegistrationStatusService } from "./services/registration-status.service";
 
 export const appRoutes: Routes = [
   {
     path: "",
     pathMatch: "full",
-    redirectTo: () => {
+    redirectTo: async () => {
       if (!inject(UtilService).isLoggedIn()) {
         if (Capacitor.isNativePlatform() || IS_DESKTOP || getIsElectron()) {
           return RouteMap.GetStartedPage.getPath();
         }
-        return RouteMap.AuthPage.getPath(AuthType.Register);
+        const registrationEnabled = await inject(
+          RegistrationStatusService,
+        ).load();
+        return RouteMap.AuthPage.getPath(
+          registrationEnabled ? AuthType.Register : AuthType.Login,
+        );
       }
 
       const startPage =
@@ -152,6 +158,17 @@ export const appRoutes: Routes = [
     path: RouteMap.AuthPage.path,
     loadComponent: () =>
       import("./pages/auth/auth.page").then((m) => m.AuthPage),
+    canActivate: [
+      async (route) => {
+        if (route.paramMap.get("authType") !== AuthType.Register) return true;
+        const router = inject(Router);
+        if (await inject(RegistrationStatusService).load()) return true;
+        return router.createUrlTree(
+          [RouteMap.AuthPage.getPath(AuthType.Login)],
+          { queryParams: route.queryParams },
+        );
+      },
+    ],
     canDeactivate: [UnsavedChangesGuardService],
     title: "pages.auth.tabTitle",
   },

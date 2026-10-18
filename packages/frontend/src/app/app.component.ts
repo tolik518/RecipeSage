@@ -41,6 +41,7 @@ import {
   FeatureFlagKeys,
   FeatureFlagService,
 } from "./services/feature-flag.service";
+import { RegistrationStatusService } from "./services/registration-status.service";
 import { Title } from "@angular/platform-browser";
 import { TRPCService } from "./services/trpc.service";
 import { ServerActionsService } from "./services/server-actions.service";
@@ -142,6 +143,7 @@ export class AppComponent {
   private preferencesService = inject(PreferencesService);
   private offlineModeService = inject(OfflineModeService);
   private featureFlagService = inject(FeatureFlagService);
+  private registrationStatusService = inject(RegistrationStatusService);
   private titleService = inject(Title);
   cookingToolbarService = inject(CookingToolbarService);
   private versionCheckService = inject(VersionCheckService);
@@ -431,6 +433,10 @@ export class AppComponent {
       this.featureFlagService.flags[FeatureFlagKeys.EnableContribution];
     const enableDiscover =
       this.featureFlagService.flags[FeatureFlagKeys.EnableDiscover];
+    // Only the logged-out menu links to registration
+    const registrationEnabled =
+      this.utilService.isLoggedIn() ||
+      (await this.registrationStatusService.load());
     const loggedOutPages = [
       [
         true,
@@ -442,7 +448,7 @@ export class AppComponent {
         },
       ],
       [
-        true,
+        registrationEnabled,
         {
           id: "register",
           title: register,

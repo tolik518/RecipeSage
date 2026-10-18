@@ -10,6 +10,7 @@ import { getMyCreditUsage } from "./getMyCreditUsage";
 import { getMyFriends } from "./getMyFriends";
 import { getMyStats } from "./getMyStats";
 import { getPreferences } from "./getPreferences";
+import { getRegistrationStatus } from "./getRegistrationStatus";
 import { getUserProfileByEmail } from "./getUserProfileByEmail";
 import { getUserProfileByHandle } from "./getUserProfileByHandle";
 import { getVisibleUserProfileItems } from "./getVisibleUserProfileItems";
@@ -40,6 +41,7 @@ export const usersRouter = router({
   getVisibleUserProfileItems,
   getUserProfilesById,
   getIsHandleAvailable,
+  getRegistrationStatus,
   createFriendship,
   deleteFriendship,
   updateMyProfile,

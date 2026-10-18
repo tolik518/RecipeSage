@@ -36,16 +36,18 @@
     </div>
 
     <div class="actions">
+      @if (registrationEnabled) {
+        <ion-button
+          expand="block"
+          [routerLink]="registerPath"
+          [state]="{ showBack: true }"
+        >
+          {{ "pages.getStarted.button.register" | translate }}
+        </ion-button>
+      }
       <ion-button
         expand="block"
-        [routerLink]="registerPath"
-        [state]="{ showBack: true }"
-      >
-        {{ "pages.getStarted.button.register" | translate }}
-      </ion-button>
-      <ion-button
-        expand="block"
-        fill="outline"
+        [fill]="registrationEnabled ? 'outline' : 'solid'"
         [routerLink]="loginPath"
         [state]="{ showBack: true }"
       >

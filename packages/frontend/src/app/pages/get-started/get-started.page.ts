@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, inject } from "@angular/core";
 import {
   IonHeader,
   IonToolbar,
@@ -10,6 +10,7 @@ import {
 
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { AuthType, RouteMap } from "../../services/util.service";
+import { RegistrationStatusService } from "../../services/registration-status.service";
 
 @Component({
   standalone: true,
@@ -29,4 +30,13 @@ import { AuthType, RouteMap } from "../../services/util.service";
 export class GetStartedPage {
   registerPath = RouteMap.AuthPage.getPath(AuthType.Register);
   loginPath = RouteMap.AuthPage.getPath(AuthType.Login);
+
+  private registrationStatusService = inject(RegistrationStatusService);
+  registrationEnabled = this.registrationStatusService.enabled;
+
+  ionViewWillEnter() {
+    this.registrationStatusService
+      .load()
+      .then((enabled) => (this.registrationEnabled = enabled));
+  }
 }

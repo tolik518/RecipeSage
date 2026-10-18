@@ -174,16 +174,18 @@
         }
       </div>
 
-      <div>
-        <ion-button fill="clear" expand="block" (click)="toggleLogin()">
-          @if (showLogin) {
-            <span>{{ "pages.auth.button.registerInstead" | translate }}</span>
-          }
-          @if (!showLogin) {
-            <span>{{ "pages.auth.button.loginInstead" | translate }}</span>
-          }
-        </ion-button>
-      </div>
+      @if (registrationEnabled) {
+        <div>
+          <ion-button fill="clear" expand="block" (click)="toggleLogin()">
+            @if (showLogin) {
+              <span>{{ "pages.auth.button.registerInstead" | translate }}</span>
+            }
+            @if (!showLogin) {
+              <span>{{ "pages.auth.button.loginInstead" | translate }}</span>
+            }
+          </ion-button>
+        </div>
+      }
     </ion-list>
   </div>
 </ion-content>
