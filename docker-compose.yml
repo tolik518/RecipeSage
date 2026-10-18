@@ -5,6 +5,9 @@
 x-common-env: &common-env
   # Public base URL for this instance. Keep the "/api" suffix.
   API_PUBLIC_BASE_URL: https://rezepte.r0.fyi/api
+  # Public web origin (no trailing slash). Used for share links and their redirect;
+  # unset, the api falls back to https://recipesage.com.
+  APP_UI_BASE_URL: https://rezepte.r0.fyi
 
   # Pushpin is only reachable inside this stack's network, so the default key is fine.
   GRIP_KEY: recipesage_selfhost
