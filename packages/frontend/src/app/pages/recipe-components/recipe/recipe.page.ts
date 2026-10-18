@@ -393,6 +393,7 @@ export class RecipePage {
           component: RecipeDetailsPopoverPage,
           componentProps,
           event,
+          cssClass: "rs-menu-popover",
         });
 
     await overlay.present();

@@ -114,3 +114,10 @@ ion-app.tab-bar-visible ion-menu-button {
 .null-state-create {
   margin-top: 16px;
 }
+
+// Menus opened from a "…" button on wider screens (e.g. the recipe actions)
+ion-popover.rs-menu-popover {
+  --width: 280px;
+  --border-radius: 12px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
+}
