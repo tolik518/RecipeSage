@@ -16,6 +16,12 @@ export class WakeLockService {
   wakeLockPending: Promise<WakeLockSentinel> | null = null;
   wakeLockRequests: WakelockRequest[] = [];
 
+  /** Whether the screen is currently being kept on */
+  get isActive() {
+    if (this.isNative) return this.wakeLockRequests.length > 0;
+    return !!this.wakeLock;
+  }
+
   constructor() {
     document.addEventListener("visibilitychange", () =>
       this.onVisiblityChange(),

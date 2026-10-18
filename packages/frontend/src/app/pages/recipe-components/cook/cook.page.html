@@ -9,6 +9,29 @@
     <ion-title dir="auto">{{ recipe?.title }}</ion-title>
 
     <ion-buttons slot="end">
+      @if (wakeLockService.isCapable) {
+        <ion-button
+          (click)="toggleWakeLock()"
+          [attr.aria-pressed]="!!wakeLockRequest"
+          [attr.aria-label]="
+            (wakeLockRequest
+              ? 'pages.cook.keepScreenOn.on'
+              : 'pages.cook.keepScreenOn.off'
+            ) | translate
+          "
+          [title]="
+            (wakeLockRequest
+              ? 'pages.cook.keepScreenOn.on'
+              : 'pages.cook.keepScreenOn.off'
+            ) | translate
+          "
+        >
+          <ion-icon
+            slot="icon-only"
+            [name]="wakeLockService.isActive ? 'sunny' : 'sunny-outline'"
+          ></ion-icon>
+        </ion-button>
+      }
       <ion-button
         (click)="changeScale()"
         [attr.aria-label]="

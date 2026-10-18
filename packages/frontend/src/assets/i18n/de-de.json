@@ -1956,6 +1956,8 @@
     "pages.cook.tabTitle": "Kochmodus – RecipeSage",
     "pages.cook.loading": "Rezept wird geladen …",
     "pages.cook.progress": "{{done}} von {{total}} Schritten",
+    "pages.cook.keepScreenOn.on": "Bildschirm bleibt an",
+    "pages.cook.keepScreenOn.off": "Bildschirm darf ausgehen",
     "pages.labels.searchPlaceholder": "Labels und Kategorien durchsuchen",
     "pages.labels.noResults": "Für deinen Suchbegriff wurden keine Labels oder Kategorien gefunden.",
     "pages.manageLabelModal.rename.placeholder": "Neuer Label-Name",

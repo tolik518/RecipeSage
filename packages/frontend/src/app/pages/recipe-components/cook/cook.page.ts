@@ -7,7 +7,11 @@ import {
   inject,
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
-import { NavController, ModalController } from "@ionic/angular/standalone";
+import {
+  NavController,
+  ModalController,
+  ToastController,
+} from "@ionic/angular/standalone";
 import { TranslateService } from "@ngx-translate/core";
 
 import { linkifyHtml } from "../../../utils/linkify";
@@ -56,6 +60,8 @@ import {
   checkmark,
   closeOutline,
   listOutline,
+  sunny,
+  sunnyOutline,
 } from "ionicons/icons";
 import { addIcons } from "ionicons";
 import { resolveStorageLocation } from "../../../utils/resolveStorageLocation";
@@ -93,7 +99,8 @@ export class CookPage implements OnDestroy {
   private navCtrl = inject(NavController);
   private modalCtrl = inject(ModalController);
   private route = inject(ActivatedRoute);
-  private wakeLockService = inject(WakeLockService);
+  wakeLockService = inject(WakeLockService);
+  private toastCtrl = inject(ToastController);
   private fullscreenService = inject(FullscreenService);
   private preferencesService = inject(PreferencesService);
   private recipeCompletionTrackerService = inject(
@@ -149,6 +156,8 @@ export class CookPage implements OnDestroy {
       checkmark,
       closeOutline,
       listOutline,
+      sunny,
+      sunnyOutline,
     });
     this.applyRouteParams();
   }
@@ -179,7 +188,7 @@ export class CookPage implements OnDestroy {
     this.notes = undefined;
     this.load();
 
-    this.setupWakeLock();
+    void this.setupWakeLock();
     this.applyCookFontSize();
   }
 
@@ -408,15 +417,36 @@ export class CookPage implements OnDestroy {
     );
   }
 
-  setupWakeLock() {
+  async setupWakeLock() {
     if (!this.wakeLockRequest) {
-      this.wakeLockService.request().then((wl) => (this.wakeLockRequest = wl));
+      this.wakeLockRequest = await this.wakeLockService.request();
     }
   }
 
   releaseWakeLock() {
     if (this.wakeLockRequest) this.wakeLockRequest.release();
     this.wakeLockRequest = null;
+  }
+
+  async toggleWakeLock() {
+    if (this.wakeLockRequest) {
+      this.releaseWakeLock();
+    } else {
+      await this.setupWakeLock();
+    }
+
+    const message = await this.translate
+      .get(
+        this.wakeLockRequest
+          ? "pages.cook.keepScreenOn.on"
+          : "pages.cook.keepScreenOn.off",
+      )
+      .toPromise();
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2000,
+    });
+    toast.present();
   }
 
   applyCookFontSize() {

@@ -32,12 +32,7 @@
       <div class="auth-entry">
         <br />
 
-        @if (isSelfHost) {
-          <div>{{ "pages.auth.selfhostWarning" | translate }}</div>
-        }
-        @if (!isSelfHost) {
-          <logo-icon [noBg]="true"></logo-icon>
-        }
+        <logo-icon [noBg]="true"></logo-icon>
         @if (showLogin) {
           <div class="welcome">
             <h2>{{ "pages.auth.welcome.login" | translate }}</h2>
@@ -126,9 +121,6 @@
 
       @if (!isSelfHost) {
         <tos-clickwrap-agreement></tos-clickwrap-agreement>
-      }
-      @if (isSelfHost) {
-        <div>{{ "pages.auth.selfhostWarning2" | translate }}</div>
       }
 
       <div class="ion-padding">
