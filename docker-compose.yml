@@ -41,7 +41,14 @@ x-common-env: &common-env
 services:
   proxy: # Entry point for the stack; host nginx proxies rezepte.r0.fyi here.
     container_name: recipesage_proxy
-    image: julianpoy/recipesage-selfhost-proxy:2026-08-16
+    # julianpoy/recipesage-selfhost-proxy:2026-08-16 plus distro security updates (os-update/), app unchanged; switch back to
+    # the plain upstream tag once upstream publishes a rebuilt one.
+    image: recipesage-os/recipesage-selfhost-proxy-2026-08-16
+    pull_policy: build
+    build:
+      context: ./os-update
+      args:
+        BASE: julianpoy/recipesage-selfhost-proxy:2026-08-16
     ports:
       - "127.0.0.1:7270:80"
     # The proxy's nginx resolves the other containers' addresses only at start, so it
@@ -104,7 +111,14 @@ services:
     restart: unless-stopped
   pushpin: # Provides websocket support
     container_name: recipesage_pushpin
-    image: julianpoy/pushpin:2023-09-17
+    # julianpoy/pushpin:2023-09-17 plus distro security updates (os-update/), app unchanged; switch back to
+    # the plain upstream tag once upstream publishes a rebuilt one.
+    image: recipesage-os/pushpin-2023-09-17
+    pull_policy: build
+    build:
+      context: ./os-update
+      args:
+        BASE: julianpoy/pushpin:2023-09-17
     entrypoint: /bin/sh -c
     command:
       [
@@ -144,7 +158,15 @@ services:
   # Needs AVX CPU support and uses about 550 MB of RAM. Only reachable inside this stack.
   grocery-categorizer:
     container_name: recipesage_grocery_categorizer
-    image: julianpoy/grocery-categorizer:f9d9562
+    # julianpoy/grocery-categorizer:f9d9562 plus distro security updates (os-update/), app unchanged; switch back to
+    # the plain upstream tag once upstream publishes a rebuilt one.
+    image: recipesage-os/grocery-categorizer-f9d9562
+    pull_policy: build
+    build:
+      context: ./os-update
+      args:
+        BASE: julianpoy/grocery-categorizer:f9d9562
+        RUN_AS: appuser
     mem_limit: 1g
     restart: unless-stopped
 

@@ -16,7 +16,7 @@ cd "$(dirname "$0")"
 
 TAG="${1:-v4.0.17-trello}"
 APP_SRC="$(cd "${APP_SRC:-../recipesage-app}" && pwd)"
-NODE_IMAGE="node:24.13-alpine"
+NODE_IMAGE="node:24.22-alpine"
 BUILD="${BUILD:-api static}"
 
 echo "==> Source: $APP_SRC ($(git -C "$APP_SRC" rev-parse --abbrev-ref HEAD) @ $(git -C "$APP_SRC" rev-parse --short HEAD))"
