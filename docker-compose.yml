@@ -1,5 +1,5 @@
 # RecipeSage (self-hosted) — https://github.com/julianpoy/recipesage-selfhost
-# Based on recipesage-selfhost config version 2026-08-16, RecipeSage version 4.0.17 (app; the config itself is unchanged upstream).
+# Based on recipesage-selfhost config version 2026-10-29, RecipeSage version 4.1.1 (app; upstream only bumped the app image tags, proxy stays 2026-08-16).
 # Fronted by host nginx at https://rezepte.r0.fyi -> 127.0.0.1:7270 (the `proxy` container).
 
 x-common-env: &common-env
@@ -67,13 +67,13 @@ services:
     restart: unless-stopped
   static: # Hosts frontend assets
     container_name: recipesage_static
-    # Custom build of tolik518/RecipeSage, branch dev (v4.0.17 + our changes). See ./build.sh
-    image: recipesage-custom:static-v4.0.17-trello
+    # Custom build of tolik518/RecipeSage, branch dev (v4.1.1 + our changes). See ./build.sh
+    image: recipesage-custom:static-v4.1.1-trello
     restart: unless-stopped
   api: # Hosts backend API
     container_name: recipesage_api
-    # Custom build of tolik518/RecipeSage, branch dev (v4.0.17 + our changes). See ./build.sh
-    image: recipesage-custom:api-v4.0.17-trello
+    # Custom build of tolik518/RecipeSage, branch dev (v4.1.1 + our changes). See ./build.sh
+    image: recipesage-custom:api-v4.1.1-trello
     depends_on:
       postgres:
         condition: service_healthy
