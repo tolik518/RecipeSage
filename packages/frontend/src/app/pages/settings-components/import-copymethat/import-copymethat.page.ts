@@ -1,8 +1,8 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 
 import { RouteMap, UtilService } from "../../../services/util.service";
 import { ImportService } from "../../../services/import.service";
-import { AlertController, NavController } from "@ionic/angular/standalone";
+import { AlertController, NavController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import {
@@ -13,10 +13,12 @@ import {
   IonTitle,
   IonContent,
   IonItem,
+  IonList,
+  IonItemGroup,
   IonLabel,
   IonButton,
   IonProgressBar,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 
 const MAX_FILE_SIZE_MB = 3000;
 
@@ -25,6 +27,7 @@ const MAX_FILE_SIZE_MB = 3000;
   selector: "page-import-copymethat",
   templateUrl: "import-copymethat.page.html",
   styleUrls: ["import-copymethat.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
@@ -34,6 +37,8 @@ const MAX_FILE_SIZE_MB = 3000;
     IonTitle,
     IonContent,
     IonItem,
+    IonList,
+    IonItemGroup,
     IonLabel,
     IonButton,
     IonProgressBar,

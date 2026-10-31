@@ -1,7 +1,16 @@
-import { Component, HostBinding, Input, inject } from "@angular/core";
-import { ModalController, PopoverController } from "@ionic/angular/standalone";
+import {
+  Component,
+  HostBinding,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { ModalController, PopoverController } from "@ionic/angular";
 import { PreferencesService } from "../../../services/preferences.service";
-import { RecipeDetailsPreferenceKey } from "@recipesage/util/shared";
+import {
+  RecipeDetailsPreferenceKey,
+  RecipeDetailsLayoutOptions,
+} from "@recipesage/util/shared";
 import { WakeLockService } from "../../../services/wakelock.service";
 import { CookingToolbarService } from "../../../services/cooking-toolbar.service";
 import type { RecipeSummary, UserPublic } from "@recipesage/prisma";
@@ -16,10 +25,12 @@ import {
   IonItem,
   IonIcon,
   IonToggle,
-  IonButton,
   IonLabel,
-} from "@ionic/angular/standalone";
+  IonSelect,
+  IonSelectOption,
+} from "@ionic/angular";
 import {
+  browsersOutline,
   calendarOutline,
   cloudDownloadOutline,
   compassOutline,
@@ -57,6 +68,7 @@ export type RecipeDetailsPopoverActionTypes =
   selector: "page-recipe-details-popover",
   templateUrl: "recipe-details-popover.page.html",
   styleUrls: ["recipe-details-popover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonList,
@@ -64,8 +76,9 @@ export type RecipeDetailsPopoverActionTypes =
     IonItem,
     IonIcon,
     IonToggle,
-    IonButton,
     IonLabel,
+    IonSelect,
+    IonSelectOption,
   ],
 })
 export class RecipeDetailsPopoverPage {
@@ -99,6 +112,7 @@ export class RecipeDetailsPopoverPage {
 
   preferences = this.preferencesService.preferences;
   preferenceKeys = RecipeDetailsPreferenceKey;
+  layoutOptions = RecipeDetailsLayoutOptions;
   enableDiscover =
     this.featureFlagService.flags[FeatureFlagKeys.EnableDiscover];
 
@@ -106,6 +120,7 @@ export class RecipeDetailsPopoverPage {
 
   constructor() {
     addIcons({
+      browsersOutline,
       calendarOutline,
       cloudDownloadOutline,
       compassOutline,

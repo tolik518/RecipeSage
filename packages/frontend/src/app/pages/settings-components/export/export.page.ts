@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { TranslateService } from "@ngx-translate/core";
 import * as Sentry from "@sentry/browser";
 
@@ -21,7 +21,10 @@ import {
   IonProgressBar,
   IonButton,
   IonList,
-} from "@ionic/angular/standalone";
+  IonListHeader,
+  IonItemGroup,
+  IonNote,
+} from "@ionic/angular";
 import { cloudDownloadOutline, documentOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 import { resolveStorageLocation } from "../../../utils/resolveStorageLocation";
@@ -56,6 +59,7 @@ const JOB_POLL_INTERVAL_MS = 60_000;
   selector: "page-export",
   templateUrl: "export.page.html",
   styleUrls: ["export.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
@@ -70,6 +74,9 @@ const JOB_POLL_INTERVAL_MS = 60_000;
     IonProgressBar,
     IonButton,
     IonList,
+    IonListHeader,
+    IonItemGroup,
+    IonNote,
   ],
 })
 export class ExportPage {

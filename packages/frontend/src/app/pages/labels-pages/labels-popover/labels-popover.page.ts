@@ -1,5 +1,10 @@
-import { Component, Input, inject } from "@angular/core";
-import { PopoverController } from "@ionic/angular/standalone";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { PopoverController } from "@ionic/angular";
 
 import { UtilService } from "../../../services/util.service";
 import {
@@ -14,21 +19,22 @@ import {
   IonListHeader,
   IonItem,
   IonToggle,
-  IonButton,
-} from "@ionic/angular/standalone";
+  IonLabel,
+} from "@ionic/angular";
 
 @Component({
   standalone: true,
   selector: "page-labels-popover",
   templateUrl: "labels-popover.page.html",
   styleUrls: ["labels-popover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonList,
     IonListHeader,
     IonItem,
     IonToggle,
-    IonButton,
+    IonLabel,
   ],
 })
 export class LabelsPopoverPage {

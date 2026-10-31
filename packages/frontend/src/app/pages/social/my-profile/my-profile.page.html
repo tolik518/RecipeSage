@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="nav">
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="defaultBackHref"></ion-back-button>
@@ -75,6 +75,7 @@
               updatedProfileFields.profileImages = myProfile.profileImages;
               markAsDirty()
             "
+            (uploadingChange)="imageUploading = $event"
           ></multi-image-upload>
           <div
             class="profile-details"
@@ -224,8 +225,9 @@
                       <ion-avatar slot="start">
                         <img
                           [src]="
-                            item.recipe?.recipeImages?.at(0)?.image?.location
-                              | resolveStorageLocation
+                            $safeNavigationMigration(
+                              item.recipe?.recipeImages?.at(0)?.image?.location
+                            ) | resolveStorageLocation
                           "
                         />
                       </ion-avatar>
@@ -302,12 +304,12 @@
   </div>
 </ion-content>
 
-<ion-footer>
+<ion-footer class="ion-no-border">
   <ion-toolbar class="ion-padding-horizontal">
     <div class="page-wrapper">
       <ion-button
         expand="block"
-        [disabled]="!isUpdatePending() || !inputIsValid()"
+        [disabled]="!isUpdatePending() || !inputIsValid() || imageUploading"
         (click)="save()"
       >
         {{ "pages.myProfile.save" | translate }}<br />

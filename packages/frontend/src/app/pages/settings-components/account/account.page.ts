@@ -1,5 +1,12 @@
-import { Component, EffectRef, effect, inject } from "@angular/core";
-import { AlertController, NavController } from "@ionic/angular/standalone";
+import {
+  Component,
+  EffectRef,
+  Signal,
+  effect,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { AlertController, NavController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import dayjs from "dayjs";
 
@@ -12,6 +19,7 @@ import {
 import { CapabilitiesService } from "../../../services/capabilities.service";
 import { getQueryParam } from "../../../utils/queryParams";
 import { ServerActionsService } from "../../../services/server-actions.service";
+import { RefreshableSignal } from "../../../services/server-actions/actions-base";
 import type { inferRouterOutputs } from "@trpc/server";
 import type { AppRouter } from "@recipesage/trpc";
 
@@ -27,23 +35,20 @@ import {
   IonContent,
   IonItem,
   IonLabel,
-  IonIcon,
+  IonList,
+  IonListHeader,
+  IonItemGroup,
+  IonNote,
   IonInput,
   IonButton,
-} from "@ionic/angular/standalone";
-import {
-  heartOutline,
-  keyOutline,
-  statsChartOutline,
-  warningOutline,
-} from "ionicons/icons";
-import { addIcons } from "ionicons";
+} from "@ionic/angular";
 
 @Component({
   standalone: true,
   selector: "page-account",
   templateUrl: "account.page.html",
   styleUrls: ["account.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
@@ -54,7 +59,10 @@ import { addIcons } from "ionicons";
     IonContent,
     IonItem,
     IonLabel,
-    IonIcon,
+    IonList,
+    IonListHeader,
+    IonItemGroup,
+    IonNote,
     IonInput,
     IonButton,
   ],
@@ -71,8 +79,8 @@ export class AccountPage {
   defaultBackHref: string = RouteMap.SettingsPage.getPath();
   contributePath: string = RouteMap.ContributePage.getPath();
 
-  private meQuery = this.serverActionsService.users.getMe();
-  me = this.meQuery.value;
+  private meQuery: RefreshableSignal<RouterOutputs["users"]["getMe"]>;
+  me: Signal<RouterOutputs["users"]["getMe"] | undefined>;
 
   myStats: RouterOutputs["users"]["getMyStats"] | null = null;
 
@@ -96,9 +104,11 @@ export class AccountPage {
   > = {};
 
   constructor() {
-    addIcons({ heartOutline, keyOutline, statsChartOutline, warningOutline });
     const resetToken = getQueryParam("token");
     if (resetToken) localStorage.setItem("token", resetToken);
+
+    this.meQuery = this.serverActionsService.users.getMe();
+    this.me = this.meQuery.value;
 
     const loading = this.loadingService.start();
 

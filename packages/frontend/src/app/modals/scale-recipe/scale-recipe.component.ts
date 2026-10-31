@@ -1,4 +1,10 @@
-import { Component, Input, OnInit, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  OnInit,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ModalController,
   IonHeader,
@@ -6,13 +12,17 @@ import {
   IonTitle,
   IonContent,
   IonItem,
-  IonLabel,
+  IonButtons,
   IonButton,
+  IonIcon,
+  IonList,
+  IonItemGroup,
+  IonNote,
   IonInput,
   IonSelect,
   IonSelectOption,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import fractionjs from "fraction.js";
 import { System } from "@recipesage/unitz-ts";
 import {
@@ -28,6 +38,8 @@ import {
   formatQuantity,
 } from "@recipesage/util/shared";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
+import { closeOutline } from "ionicons/icons";
+import { addIcons } from "ionicons";
 
 export type UnitSystem = "original" | "metric" | "imperial";
 
@@ -41,6 +53,7 @@ interface AnchorOption extends AnchorMeasurement {
   selector: "scale-recipe",
   templateUrl: "scale-recipe.component.html",
   styleUrls: ["scale-recipe.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
@@ -48,8 +61,12 @@ interface AnchorOption extends AnchorMeasurement {
     IonTitle,
     IonContent,
     IonItem,
-    IonLabel,
+    IonButtons,
     IonButton,
+    IonIcon,
+    IonList,
+    IonItemGroup,
+    IonNote,
     IonInput,
     IonSelect,
     IonSelectOption,
@@ -73,6 +90,10 @@ export class ScaleRecipeComponent implements OnInit {
   anchorQtyInput: string = "";
 
   readonly presets = ["1/2", "1", "2", "3", "4"];
+
+  constructor() {
+    addIcons({ closeOutline });
+  }
 
   ngOnInit() {
     this.scale = applyDecimalNotation(this.scale, this.decimalNotationMode);
@@ -180,6 +201,10 @@ export class ScaleRecipeComponent implements OnInit {
     this.refreshAnchorQtyFromScale();
   }
 
+  isPresetSelected(preset: string) {
+    return this.toNumeric(this.scale) === this.toNumeric(preset);
+  }
+
   onScaleInput() {
     this.refreshServingsFromScale();
     this.refreshAnchorQtyFromScale();
@@ -221,6 +246,19 @@ export class ScaleRecipeComponent implements OnInit {
     return this.anchorOptions.find(
       (candidate) => candidate.index === this.anchorIndex,
     );
+  }
+
+  anchorQtyLabel(anchor: AnchorOption) {
+    if (anchor.unit) {
+      return {
+        key: "components.scaleRecipe.anchorQty",
+        params: { unit: anchor.unit, originalQty: anchor.qtyText },
+      };
+    }
+    return {
+      key: "components.scaleRecipe.anchorQtyNoUnit",
+      params: { originalQty: anchor.qtyText },
+    };
   }
 
   private sanitizedScale(): string {

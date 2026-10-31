@@ -1,9 +1,14 @@
-import { Component, Input, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   ModalController,
   AlertController,
   ToggleCustomEvent,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { LoadingService } from "../../../services/loading.service";
 import { TranslateService } from "@ngx-translate/core";
 import type { LabelGroupSummary, LabelSummary } from "@recipesage/prisma";
@@ -13,6 +18,7 @@ import {
   SelectMultipleItemsComponent,
 } from "../../../components/select-multiple-items/select-multiple-items.component";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { TextInputComponent } from "../../../components/forms/text-input/text-input.component";
 import {
   IonHeader,
   IonToolbar,
@@ -22,11 +28,13 @@ import {
   IonIcon,
   IonContent,
   IonItem,
-  IonInput,
+  IonList,
+  IonItemGroup,
+  IonNote,
   IonToggle,
   IonLabel,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { closeOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -35,8 +43,10 @@ import { addIcons } from "ionicons";
   selector: "page-manage-label-group-modal",
   templateUrl: "manage-label-group-modal.page.html",
   styleUrls: ["manage-label-group-modal.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
+    TextInputComponent,
     SelectMultipleItemsComponent,
     IonHeader,
     IonToolbar,
@@ -46,7 +56,9 @@ import { addIcons } from "ionicons";
     IonIcon,
     IonContent,
     IonItem,
-    IonInput,
+    IonList,
+    IonItemGroup,
+    IonNote,
     IonToggle,
     IonLabel,
     IonFooter,

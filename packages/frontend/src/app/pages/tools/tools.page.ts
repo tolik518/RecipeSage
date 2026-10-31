@@ -1,5 +1,5 @@
-import { Component, inject } from "@angular/core";
-import { NavController } from "@ionic/angular/standalone";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { NavController } from "@ionic/angular";
 
 import { RouteMap } from "../../services/util.service";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
@@ -11,10 +11,11 @@ import {
   IonTitle,
   IonContent,
   IonList,
+  IonItemGroup,
   IonItem,
   IonLabel,
   IonIcon,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { addIcons } from "ionicons";
 import {
   basketOutline,
@@ -32,6 +33,7 @@ import {
   selector: "page-tools",
   templateUrl: "tools.page.html",
   styleUrls: ["tools.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
@@ -41,6 +43,7 @@ import {
     IonTitle,
     IonContent,
     IonList,
+    IonItemGroup,
     IonItem,
     IonLabel,
     IonIcon,

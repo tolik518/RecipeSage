@@ -1,14 +1,14 @@
-import { AfterViewInit, Component, Input } from "@angular/core";
+import {
+  AfterViewInit,
+  Component,
+  Input,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { Capacitor } from "@capacitor/core";
 import { Share } from "@capacitor/share";
 import { Clipboard } from "@capacitor/clipboard";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
-import {
-  IonItem,
-  IonLabel,
-  IonButton,
-  IonIcon,
-} from "@ionic/angular/standalone";
+import { IonButton, IonIcon } from "@ionic/angular";
 import { copyOutline, shareOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -17,7 +17,8 @@ import { addIcons } from "ionicons";
   selector: "copy-with-webshare",
   templateUrl: "copy-with-webshare.component.html",
   styleUrls: ["./copy-with-webshare.component.scss"],
-  imports: [...SHARED_UI_IMPORTS, IonItem, IonLabel, IonButton, IonIcon],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [...SHARED_UI_IMPORTS, IonButton, IonIcon],
 })
 export class CopyWithWebshareComponent implements AfterViewInit {
   @Input() webshareTitle?: string;
@@ -29,6 +30,7 @@ export class CopyWithWebshareComponent implements AfterViewInit {
   copyText!: string;
 
   @Input() disableWebshare: boolean = false;
+  @Input() hideInstructions: boolean = false;
 
   private isNative = Capacitor.isNativePlatform();
   hasCopyAPI: boolean = this.isNative || !!document.execCommand;

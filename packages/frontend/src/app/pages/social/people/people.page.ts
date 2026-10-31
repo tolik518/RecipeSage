@@ -1,10 +1,11 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Router } from "@angular/router";
 import {
   ToastController,
   AlertController,
   NavController,
   ModalController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { IS_SELFHOST } from "../../../../environments/environment";
@@ -15,6 +16,7 @@ import { LoadingService } from "../../../services/loading.service";
 import { UtilService, RouteMap } from "../../../services/util.service";
 import { AddFriendModalPage } from "../add-friend-modal/add-friend-modal.page";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import { NullStateComponent } from "../../../components/null-state/null-state.component";
 import { SelfhostWarningItemComponent } from "../../../components/selfhost-warning-item/selfhost-warning-item.component";
 import {
@@ -22,6 +24,7 @@ import {
   IonToolbar,
   IonButtons,
   IonMenuButton,
+  IonBackButton,
   IonTitle,
   IonContent,
   IonIcon,
@@ -30,12 +33,13 @@ import {
   IonItem,
   IonAvatar,
   IonList,
-  IonItemDivider,
+  IonItemGroup,
+  IonListHeader,
   IonFab,
   IonFabButton,
   IonSpinner,
   IonBadge,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   addOutline,
   banOutline,
@@ -52,6 +56,7 @@ import { addIcons } from "ionicons";
   selector: "page-people",
   templateUrl: "people.page.html",
   styleUrls: ["people.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,
@@ -60,6 +65,7 @@ import { addIcons } from "ionicons";
     IonToolbar,
     IonButtons,
     IonMenuButton,
+    IonBackButton,
     IonTitle,
     IonContent,
     IonIcon,
@@ -68,7 +74,8 @@ import { addIcons } from "ionicons";
     IonItem,
     IonAvatar,
     IonList,
-    IonItemDivider,
+    IonItemGroup,
+    IonListHeader,
     IonFab,
     IonFabButton,
     IonSpinner,
@@ -86,9 +93,14 @@ export class PeoplePage {
       personCircleOutline,
       searchOutline,
     });
+
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
   }
 
   navCtrl = inject(NavController);
+  router = inject(Router);
   translate = inject(TranslateService);
   toastCtrl = inject(ToastController);
   alertCtrl = inject(AlertController);
@@ -97,7 +109,10 @@ export class PeoplePage {
   loadingService = inject(LoadingService);
   serverActionsService = inject(ServerActionsService);
 
-  defaultBackHref: string = RouteMap.SettingsPage.getPath();
+  isNativeIOS = IS_NATIVE_IOS;
+
+  showBack = false;
+  defaultBackHref: string = RouteMap.MorePage.getPath();
   isSelfHost = IS_SELFHOST;
 
   private meQuery = this.serverActionsService.users.getMe();
@@ -142,7 +157,9 @@ export class PeoplePage {
   }
 
   goToMessages() {
-    this.navCtrl.navigateForward(RouteMap.MessagesPage.getPath());
+    this.navCtrl.navigateForward(RouteMap.MessagesPage.getPath(), {
+      state: { showBack: true },
+    });
   }
 
   goToInbox() {

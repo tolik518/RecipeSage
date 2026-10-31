@@ -1,5 +1,10 @@
-import { Component, Input, inject } from "@angular/core";
-import { ToastController, PopoverController } from "@ionic/angular/standalone";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { ToastController, PopoverController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { UtilService } from "../../services/util.service";
@@ -17,10 +22,10 @@ import {
   IonSelect,
   IonSelectOption,
   IonToggle,
-  IonButton,
+  IonLabel,
   IonIcon,
-} from "@ionic/angular/standalone";
-import { checkmarkOutline, closeOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import { checkmarkOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 @Component({
@@ -28,6 +33,7 @@ import { addIcons } from "ionicons";
   selector: "page-home-popover",
   templateUrl: "home-popover.page.html",
   styleUrls: ["home-popover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonList,
@@ -36,13 +42,13 @@ import { addIcons } from "ionicons";
     IonSelect,
     IonSelectOption,
     IonToggle,
-    IonButton,
+    IonLabel,
     IonIcon,
   ],
 })
 export class HomePopoverPage {
   constructor() {
-    addIcons({ checkmarkOutline, closeOutline });
+    addIcons({ checkmarkOutline });
   }
 
   translate = inject(TranslateService);
@@ -58,23 +64,15 @@ export class HomePopoverPage {
   @Input({
     required: true,
   })
-  selectionMode!: boolean;
-
-  @Input({
-    required: true,
-  })
   guestMode!: boolean;
 
-  toggleSelectionMode() {
-    const enteringSelectionMode = !this.selectionMode;
-    if (enteringSelectionMode) {
-      this.quickTutorialService.triggerQuickTutorial(
-        QuickTutorialOptions.MultipleRecipeSelection,
-      );
-    }
+  enterSelectionMode() {
+    this.quickTutorialService.triggerQuickTutorial(
+      QuickTutorialOptions.MultipleRecipeSelection,
+    );
 
     this.popoverCtrl.dismiss({
-      selectionMode: enteringSelectionMode,
+      selectionMode: true,
     });
   }
 

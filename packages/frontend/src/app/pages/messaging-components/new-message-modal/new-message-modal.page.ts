@@ -1,15 +1,21 @@
-import { Component, Input, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   NavController,
   ModalController,
   ToastController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { UtilService, RouteMap } from "../../../services/util.service";
 import { ServerActionsService } from "../../../services/server-actions.service";
 import type { UserPublic } from "@recipesage/prisma";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { TextAreaComponent } from "../../../components/forms/text-area/text-area.component";
 import { SelectUserComponent } from "../../../components/select-user/select-user.component";
 import {
   IonHeader,
@@ -19,11 +25,10 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonItem,
   IonLabel,
-  IonTextarea,
+  IonNote,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { closeOutline, sendOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -32,8 +37,10 @@ import { addIcons } from "ionicons";
   selector: "page-new-message-modal",
   templateUrl: "new-message-modal.page.html",
   styleUrls: ["new-message-modal.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
+    TextAreaComponent,
     SelectUserComponent,
     IonHeader,
     IonToolbar,
@@ -42,9 +49,8 @@ import { addIcons } from "ionicons";
     IonButton,
     IonIcon,
     IonContent,
-    IonItem,
     IonLabel,
-    IonTextarea,
+    IonNote,
     IonFooter,
   ],
 })

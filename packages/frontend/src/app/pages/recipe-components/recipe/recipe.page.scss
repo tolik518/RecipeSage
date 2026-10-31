@@ -5,6 +5,15 @@
   margin: 0 auto;
   // The header layout follows the space the page gets (the side menu may take some)
   container-type: inline-size;
+
+  ion-item {
+    --padding-start: 0;
+    --inner-padding-end: 0;
+  }
+
+  > .ion-padding {
+    padding-inline: 0;
+  }
 }
 
 @media only screen and (max-width: $desktop-breakpoint) {
@@ -66,53 +75,6 @@ h2.recipeTitle {
   margin-top: 0 !important;
 }
 
-.ingredientsInstructionsGrid {
-  display: flex;
-  flex-wrap: wrap;
-  padding-left: 0;
-
-  .ingredientsCol {
-    flex-shrink: 0;
-    max-width: 100%;
-    width: 100%;
-  }
-
-  .instructionsCol {
-    min-width: 100%; // Force instructions column to wrap
-    flex-grow: 1;
-
-    .instruction {
-      max-width: 900px;
-    }
-  }
-
-  @media (min-width: 576px) {
-    flex-wrap: nowrap;
-
-    .instructionsCol {
-      min-width: auto; // Allow instructions column to wrap
-    }
-
-    .ingredientsCol {
-      width: 215px;
-    }
-  }
-
-  // Wide screens: ingredients get a third of the width and stay in view while
-  // scrolling through the steps (scrolling on their own if they are longer)
-  @media (min-width: 1000px) {
-    .ingredientsCol {
-      width: 34%;
-      position: sticky;
-      top: 0;
-      align-self: flex-start;
-      max-height: calc(100vh - 72px);
-      overflow-y: auto;
-      overscroll-behavior: contain;
-    }
-  }
-}
-
 .ingredients {
   ion-label {
     margin: 0;
@@ -161,6 +123,7 @@ h2.recipeTitle {
   }
 
   .instruction {
+    max-width: 900px;
     margin-bottom: 15px;
 
     .sectionHeader {
@@ -193,12 +156,11 @@ h2.recipeTitle {
 }
 
 .meta {
-  // Soft card instead of two divider lines
-  background: var(--ion-color-step-50, rgba(0, 0, 0, 0.04));
-  border-radius: 14px;
-  padding: 6px 8px;
   margin-top: 15px;
   margin-bottom: 15px;
+  padding: 6px 8px;
+  border-radius: 16px;
+  background: var(--rs-subtle-surface-color);
 
   ion-col {
     padding: 5px;
@@ -320,10 +282,6 @@ ion-item:has(> ion-icon) > ion-label.section-title p {
 }
 
 // --- Actions ----------------------------------------------------------------
-.action-buttons ion-button {
-  min-height: 44px;
-}
-
 .recipe-action-bar {
   ion-toolbar {
     --background: var(--ion-color-nav);
@@ -366,10 +324,10 @@ ion-item:has(> ion-icon) > ion-label.section-title p {
   }
 }
 
-// Phones: the action bar replaces the button rows at the bottom of the page
+// Phones: the action bar replaces the action tiles at the bottom of the page
 // (one pixel below the breakpoint, so exactly one of the two is always shown)
 @media only screen and (max-width: ($desktop-breakpoint - 1px)) {
-  .action-buttons {
+  .action-tiles {
     display: none;
   }
 }
@@ -425,5 +383,52 @@ ion-item:has(> ion-icon) > ion-label.section-title p {
       max-width: none;
       margin: 0;
     }
+  }
+}
+
+.action-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  margin: 8px 0 16px;
+
+  @media only screen and (min-width: $desktop-breakpoint) {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+.action-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 76px;
+  padding: 10px 4px;
+  border: none;
+  border-radius: 16px;
+  background: rgba(var(--ion-color-primary-rgb), 0.1);
+  color: var(--ion-color-primary);
+  font: inherit;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  text-align: center;
+  cursor: pointer;
+
+  ion-icon {
+    font-size: 24px;
+  }
+
+  &:active {
+    background: rgba(var(--ion-color-primary-rgb), 0.2);
+  }
+}
+
+.action-tile-danger {
+  background: rgba(var(--ion-color-danger-rgb), 0.1);
+  color: var(--ion-color-danger);
+
+  &:active {
+    background: rgba(var(--ion-color-danger-rgb), 0.2);
   }
 }

@@ -5,6 +5,7 @@ import {
   EventEmitter,
   inject,
   type OnDestroy,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import dayjs, { Dayjs } from "dayjs";
 
@@ -30,8 +31,8 @@ import {
   IonList,
   IonItem,
   IonLabel,
-} from "@ionic/angular/standalone";
-import { caretBack, caretForward } from "ionicons/icons";
+} from "@ionic/angular";
+import { chevronBack, chevronForward } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 @Component({
@@ -39,6 +40,7 @@ import { addIcons } from "ionicons";
   selector: "meal-calendar",
   templateUrl: "meal-calendar.component.html",
   styleUrls: ["./meal-calendar.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     MealGroupComponent,
@@ -126,7 +128,7 @@ export class MealCalendarComponent implements OnDestroy {
   }
 
   constructor() {
-    addIcons({ caretBack, caretForward });
+    addIcons({ chevronBack, chevronForward });
     setTimeout(() => {
       this.mealsByDateChange.emit(this.mealsByDate);
       this.selectedDaysChange.emit(this.selectedDays);
@@ -341,7 +343,9 @@ export class MealCalendarComponent implements OnDestroy {
   }
 
   dayMouseDown(event: any, day: Dayjs) {
-    this.dayDragInProgress = true;
+    this.dayDragInProgress = !(
+      event.target instanceof Element && event.target.closest("calendar-item")
+    );
     this.selectionIsDefault = false;
     if (event.shiftKey && this.dragAnchor) {
       this.selectedDays = this.getDaysBetween(this.dragAnchor, day);
@@ -374,7 +378,9 @@ export class MealCalendarComponent implements OnDestroy {
     return dateStamps;
   }
 
-  dayMouseOver(_: any, day: Dayjs) {
+  dayMouseOver(event: MouseEvent, day: Dayjs) {
+    if (!(event.buttons & 1)) this.dayDragInProgress = false;
+
     if (this.dayDragInProgress && this.dragAnchor) {
       this.selectedDays = this.getDaysBetween(this.dragAnchor, day);
     }

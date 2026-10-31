@@ -1,9 +1,15 @@
-import { Component, OnDestroy, inject } from "@angular/core";
+import {
+  Component,
+  OnDestroy,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { Router } from "@angular/router";
 import {
   NavController,
   AlertController,
   ModalController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import {
@@ -22,6 +28,7 @@ import {
   OfflineModePromptOptions,
   PreferencesSync,
   RecipeDetailsPreferenceKey,
+  RecipeDetailsLayoutOptions,
   StartPageOptions,
   SupportedLanguages,
 } from "@recipesage/util/shared";
@@ -43,26 +50,29 @@ import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { DebugStoreService } from "../../../services/debugStore.service";
 import { DEBUG_DUMP_PUBLIC_KEY } from "../../../utils/localDb/DEBUG_DUMP_PUBLIC_KEY";
 import { downloadBlobpartsAsFile } from "../../../utils/downloadBlobpartsAsFile";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import {
   IonHeader,
   IonToolbar,
   IonButtons,
   IonMenuButton,
+  IonBackButton,
   IonTitle,
   IonContent,
   IonList,
   IonListHeader,
+  IonItemGroup,
   IonItem,
   IonIcon,
   IonLabel,
   IonToggle,
   IonSelect,
   IonSelectOption,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
+  browsersOutline,
   brushOutline,
   bugOutline,
-  caretDownSharp,
   closeOutline,
   cloudDownloadOutline,
   cloudOfflineOutline,
@@ -90,16 +100,19 @@ import { addIcons } from "ionicons";
   selector: "page-settings",
   templateUrl: "settings.page.html",
   styleUrls: ["settings.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,
     IonToolbar,
     IonButtons,
     IonMenuButton,
+    IonBackButton,
     IonTitle,
     IonContent,
     IonList,
     IonListHeader,
+    IonItemGroup,
     IonItem,
     IonIcon,
     IonLabel,
@@ -111,6 +124,7 @@ import { addIcons } from "ionicons";
 export class SettingsPage implements OnDestroy {
   private events = inject(EventService);
   private navCtrl = inject(NavController);
+  private router = inject(Router);
   private translate = inject(TranslateService);
   private alertCtrl = inject(AlertController);
   private modalCtrl = inject(ModalController);
@@ -130,6 +144,7 @@ export class SettingsPage implements OnDestroy {
   preferenceKeys = GlobalPreferenceKey;
   offlineModePromptOptions = OfflineModePromptOptions;
   recipeDetailsPreferenceKeys = RecipeDetailsPreferenceKey;
+  recipeLayoutOptions = RecipeDetailsLayoutOptions;
   myRecipesPreferenceKeys = MyRecipesPreferenceKey;
   includeFriendsOptions = MyRecipesIncludeFriendsOptions;
 
@@ -152,11 +167,18 @@ export class SettingsPage implements OnDestroy {
   startPageOptions = StartPageOptions;
   isLoggedIn: boolean = false;
 
+  showBack = false;
+  defaultBackHref: string = RouteMap.MorePage.getPath();
+
   constructor() {
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
+
     addIcons({
+      browsersOutline,
       brushOutline,
       bugOutline,
-      caretDownSharp,
       closeOutline,
       cloudDownloadOutline,
       cloudOfflineOutline,
@@ -178,7 +200,7 @@ export class SettingsPage implements OnDestroy {
       trashBinOutline,
     });
     try {
-      this.showSplitPaneOption = screen.width >= 1200;
+      this.showSplitPaneOption = !IS_NATIVE_IOS && screen.width >= 1200;
     } catch (e) {
       console.error("Could not get screen width", e);
     }
@@ -339,7 +361,7 @@ export class SettingsPage implements OnDestroy {
           text: local,
           handler: () => {
             this.preferences[GlobalPreferenceKey.PreferencesSync] = value;
-            this.preferencesService.save();
+            this.preferencesService.saveAllToServer();
           },
         },
         {

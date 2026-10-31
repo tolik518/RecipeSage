@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, ChangeDetectionStrategy, inject } from "@angular/core";
 import {
   IonHeader,
   IonToolbar,
@@ -6,7 +6,7 @@ import {
   IonMenuButton,
   IonContent,
   IonButton,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { AuthType, RouteMap } from "../../services/util.service";
@@ -17,6 +17,7 @@ import { RegistrationStatusService } from "../../services/registration-status.se
   selector: "page-get-started",
   templateUrl: "get-started.page.html",
   styleUrls: ["get-started.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,

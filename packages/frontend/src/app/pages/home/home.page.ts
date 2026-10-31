@@ -1,11 +1,17 @@
-import { Component, ElementRef, inject, OnDestroy } from "@angular/core";
+import {
+  Component,
+  ElementRef,
+  inject,
+  OnDestroy,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { ActivatedRoute, Router } from "@angular/router";
 import { TranslateService } from "@ngx-translate/core";
 import {
   NavController,
   AlertController,
   PopoverController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { Datasource, UiScrollModule } from "ngx-ui-scroll";
 
 import { LoadingService } from "../../services/loading.service";
@@ -24,6 +30,7 @@ import { HomePopoverPage } from "../home-popover/home-popover.page";
 import { HomeSearchFilterPopoverPage } from "../home-search-popover/home-search-filter-popover.page";
 import { ServerActionsService } from "../../services/server-actions.service";
 import { CookingToolbarService } from "../../services/cooking-toolbar.service";
+import { NativeTabBarService } from "../../services/native-tab-bar.service";
 import type {
   LabelSummary,
   NutritionFilter,
@@ -33,8 +40,10 @@ import type {
 import { countActiveNutritionRanges } from "../../utils/nutritionFilter";
 import { maybeRequestPersistentStorage } from "../../utils/persistentStorage";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../utils/isNativeIOS";
 import { LogoIconComponent } from "../../components/logo-icon/logo-icon.component";
 import { NullStateComponent } from "../../components/null-state/null-state.component";
+import { getScrollbarWidth } from "../../utils/getScrollbarWidth";
 import { RecipeListItemComponent } from "../../components/recipe-list-item/recipe-list-item.component";
 import { LabelChipsComponent } from "../../components/label-chips/label-chips.component";
 import { RatingComponent } from "../../components/rating/rating.component";
@@ -54,7 +63,7 @@ import {
   IonFab,
   IonFabButton,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   addOutline,
   closeOutline,
@@ -71,6 +80,8 @@ import { addIcons } from "ionicons";
 const TILE_WIDTH = 200;
 const TILE_PADD = 20;
 const MOBILE_TWO_COLUMN_MIN_WIDTH = 375;
+const TWO_COLUMN_TILE_GUTTER = 32;
+const RESIZE_DEBOUNCE_MS = 150;
 // Wide screens: tiles stretch to fill a centered grid of at most this width
 // (keep in sync with $tile-grid-max-width in home.page.scss)
 const TILE_GRID_MAX_WIDTH = 1400;
@@ -82,6 +93,7 @@ const SPLIT_PANE_MIN_WIDTH = 1024;
   selector: "page-home",
   templateUrl: "home.page.html",
   styleUrls: ["home.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     LogoIconComponent,
@@ -122,6 +134,9 @@ export class HomePage implements OnDestroy {
   private utilService = inject(UtilService);
   private cookingToolbarService = inject(CookingToolbarService);
   private elementRef = inject<ElementRef<HTMLElement>>(ElementRef);
+  private nativeTabBarService = inject(NativeTabBarService);
+
+  isNativeIOS = IS_NATIVE_IOS;
 
   defaultBackHref: string = RouteMap.PeoplePage.getPath();
   aboutHref: string = RouteMap.AboutPage.getPath();
@@ -166,6 +181,7 @@ export class HomePage implements OnDestroy {
   nutritionFilter: NutritionFilter = {};
 
   tileColCount: number = 1;
+  tileWidth = TILE_WIDTH;
 
   datasource = new Datasource<RecipeSummaryLite>({
     get: async (index: number, count: number) => {
@@ -267,10 +283,14 @@ export class HomePage implements OnDestroy {
   ionViewWillEnter() {
     window.addEventListener("resize", this.onWindowResize);
     this.events.subscribe(
-      EventName.ApplicationSplitPaneChanged,
+      [
+        EventName.ApplicationSplitPaneChanged,
+        EventName.ApplicationVerticalBarInsetChanged,
+        EventName.ApplicationFontSizeChanged,
+      ],
       this.onWindowResize,
     );
-    this.updateTileColCount();
+    this.updateLayout();
 
     this.clearSelectedRecipes();
 
@@ -308,22 +328,20 @@ export class HomePage implements OnDestroy {
   ionViewWillLeave() {
     window.removeEventListener("resize", this.onWindowResize);
     this.events.unsubscribe(
-      EventName.ApplicationSplitPaneChanged,
+      [
+        EventName.ApplicationSplitPaneChanged,
+        EventName.ApplicationVerticalBarInsetChanged,
+        EventName.ApplicationFontSizeChanged,
+      ],
       this.onWindowResize,
     );
-    if (this.resizeFrame !== null) {
-      cancelAnimationFrame(this.resizeFrame);
-      this.resizeFrame = null;
-    }
+    clearTimeout(this.resizeTimeout);
   }
 
-  private resizeFrame: number | null = null;
+  private resizeTimeout: NodeJS.Timeout | undefined;
   private onWindowResize = () => {
-    if (this.resizeFrame !== null) return;
-    this.resizeFrame = requestAnimationFrame(() => {
-      this.resizeFrame = null;
-      this.updateTileColCount();
-    });
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(this.updateLayout, RESIZE_DEBOUNCE_MS);
   };
 
   onWSEvent = (data: Record<string, string>) => {
@@ -382,6 +400,9 @@ export class HomePage implements OnDestroy {
     }
   }
 
+  private lastLayoutPageWidth?: number;
+  private lastLayoutFontSize?: string;
+
   // Width the page's content actually gets (the side menu may take part of the window)
   private getHomePageWidth(): number {
     const measured =
@@ -392,10 +413,14 @@ export class HomePage implements OnDestroy {
       this.preferences[GlobalPreferenceKey.EnableSplitPane];
     const isSidebarOpen = window.innerWidth >= SPLIT_PANE_MIN_WIDTH;
     const sidebarWidth = isSidebarEnabled && isSidebarOpen ? 300 : 0;
-    return window.innerWidth - sidebarWidth;
+    return (
+      window.innerWidth -
+      sidebarWidth -
+      this.nativeTabBarService.getHorizontalContentInset()
+    );
   }
 
-  updateTileColCount = () => {
+  updateLayout = () => {
     const homePageWidth = Math.min(
       this.getHomePageWidth(),
       TILE_GRID_MAX_WIDTH,
@@ -407,13 +432,40 @@ export class HomePage implements OnDestroy {
       minimumColumnCount,
     );
 
-    if (tileColCount !== this.tileColCount) {
-      this.tileColCount = tileColCount;
+    const tileWidth =
+      tileColCount === 2
+        ? Math.min(
+            TILE_WIDTH,
+            Math.floor(
+              (homePageWidth - getScrollbarWidth() - TWO_COLUMN_TILE_GUTTER) /
+                2,
+            ),
+          )
+        : TILE_WIDTH;
+    const fontSize = getComputedStyle(document.documentElement).fontSize;
 
-      // We set to zero since we don't know what the relative position would be now
-      this.datasource.settings!.startIndex = 0;
-      this.datasource.adapter.reset();
+    if (
+      tileColCount === this.tileColCount &&
+      tileWidth === this.tileWidth &&
+      homePageWidth === this.lastLayoutPageWidth &&
+      fontSize === this.lastLayoutFontSize
+    ) {
+      return;
     }
+
+    const previousTileColCount = this.tileColCount;
+    this.tileColCount = tileColCount;
+    this.tileWidth = tileWidth;
+    this.lastLayoutPageWidth = homePageWidth;
+    this.lastLayoutFontSize = fontSize;
+
+    const firstVisibleIndex = this.datasource.adapter.firstVisible.$index ?? 0;
+    const isTiled =
+      this.preferences[MyRecipesPreferenceKey.ViewType] === "tiles";
+    this.datasource.settings!.startIndex = isTiled
+      ? Math.floor((firstVisibleIndex * previousTileColCount) / tileColCount)
+      : firstVisibleIndex;
+    this.datasource.adapter.reset();
   };
 
   async fetchMoreRecipes(target: number) {
@@ -544,9 +596,7 @@ export class HomePage implements OnDestroy {
     const result = await this.serverActionsService.recipes.getRecipes({
       folder: this.folder,
       orderBy: sortPreference.replace("-", "") as
-        | "title"
-        | "createdAt"
-        | "updatedAt",
+        "title" | "createdAt" | "updatedAt",
       orderDirection: sortPreference.startsWith("-") ? "desc" : "asc",
       offset,
       limit: this.fetchPerPage,
@@ -645,7 +695,6 @@ export class HomePage implements OnDestroy {
       component: HomePopoverPage,
       componentProps: {
         guestMode: !!this.userId,
-        selectionMode: this.selectionMode,
       },
       event,
     });
@@ -653,12 +702,7 @@ export class HomePage implements OnDestroy {
     popover.onDidDismiss().then(({ data }) => {
       if (!data) return;
 
-      if (typeof data.selectionMode === "boolean") {
-        this.selectionMode = data.selectionMode;
-        if (!this.selectionMode) {
-          this.clearSelectedRecipes();
-        }
-      }
+      if (data.selectionMode) this.selectionMode = true;
       if (data.refreshSearch) this.resetAndLoadRecipes();
     });
 

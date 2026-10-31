@@ -1,10 +1,16 @@
-import { Component, Input, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   PopoverController,
   IonList,
-  IonButton,
+  IonItem,
+  IonLabel,
   IonIcon,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { banOutline, flagOutline } from "ionicons/icons";
@@ -17,7 +23,8 @@ export type UserActionsPopoverAction = "report" | "block" | "unblock";
   selector: "page-user-actions-popover",
   templateUrl: "user-actions-popover.page.html",
   styleUrls: ["user-actions-popover.page.scss"],
-  imports: [...SHARED_UI_IMPORTS, IonList, IonButton, IonIcon],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [...SHARED_UI_IMPORTS, IonList, IonItem, IonLabel, IonIcon],
 })
 export class UserActionsPopoverPage {
   private popoverCtrl = inject(PopoverController);

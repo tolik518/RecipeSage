@@ -1,5 +1,11 @@
-import { Component, ViewChild, Input, inject } from "@angular/core";
-import { IonSelect, PopoverController } from "@ionic/angular/standalone";
+import {
+  Component,
+  ViewChild,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { IonSelect, PopoverController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { PreferencesService } from "../../services/preferences.service";
@@ -23,8 +29,12 @@ import {
   IonIcon,
   IonToggle,
   IonSelectOption,
-} from "@ionic/angular/standalone";
-import { caretDownSharp, funnelOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import {
+  caretDownSharp,
+  chevronExpandOutline,
+  funnelOutline,
+} from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 @Component({
@@ -32,6 +42,7 @@ import { addIcons } from "ionicons";
   selector: "page-home-search-filter-popover",
   templateUrl: "home-search-filter-popover.page.html",
   styleUrls: ["home-search-filter-popover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonList,
@@ -47,7 +58,7 @@ import { addIcons } from "ionicons";
 })
 export class HomeSearchFilterPopoverPage {
   constructor() {
-    addIcons({ caretDownSharp, funnelOutline });
+    addIcons({ caretDownSharp, chevronExpandOutline, funnelOutline });
   }
 
   private translate = inject(TranslateService);

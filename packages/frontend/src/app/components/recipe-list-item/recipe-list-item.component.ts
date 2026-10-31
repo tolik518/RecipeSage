@@ -1,5 +1,11 @@
-import { Component, EventEmitter, Input, Output } from "@angular/core";
-import { IonBadge } from "@ionic/angular/standalone";
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { IonBadge } from "@ionic/angular";
 import type { RecipeSummaryLite } from "@recipesage/prisma";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { RatingComponent } from "../rating/rating.component";
@@ -10,6 +16,7 @@ import { LabelChipsComponent } from "../label-chips/label-chips.component";
   selector: "recipe-list-item",
   templateUrl: "./recipe-list-item.component.html",
   styleUrls: ["./recipe-list-item.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonBadge,

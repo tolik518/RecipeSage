@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="nav">
     <ion-buttons slot="start">
       <ion-back-button [defaultHref]="defaultBackHref"></ion-back-button>
@@ -16,7 +16,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content [fullscreen]="true" class="ion-padding">
   @if (notFound) {
     <div class="not-found">
       <p>{{ "pages.discoverRecipe.notFound" | translate }}</p>
@@ -107,7 +107,7 @@
       <br />
 
       @if (isLoggedIn() && !isAuthor()) {
-        <div class="discover-action-row rate-block">
+        <div class="rate-block">
           <span class="rate-label">{{
             "pages.discoverRecipe.rateThis" | translate
           }}</span>
@@ -120,7 +120,7 @@
       }
 
       @if (!isAuthor()) {
-        <div class="discover-action-row actions">
+        <div class="actions">
           @if (isLoggedIn()) {
             <ion-button (click)="save()" [disabled]="saving">
               <ion-icon name="bookmark-outline" slot="start"></ion-icon>
@@ -136,86 +136,104 @@
       }
 
       <br />
-      <div class="ingredientsInstructionsGrid">
-        <div class="ingredientsCol">
-          <ion-item lines="none">
-            <ion-icon name="book-outline" slot="start" size="large"></ion-icon>
-            <ion-label class="section-title">
-              <p>{{ "pages.recipeDetails.ingredients" | translate }}</p>
-            </ion-label>
-          </ion-item>
-          <ion-item class="ingredients ion-text-wrap" lines="none">
-            <ion-label dir="auto">
-              @for (
-                ingredient of ingredients;
-                track ingredient;
-                let ingredientIdx = $index
-              ) {
-                <p
-                  [innerHTML]="ingredient.htmlContent"
-                  dir="auto"
-                  class="ingredient ion-text-wrap"
-                  [ngClass]="{
-                    header: ingredient.isHeader,
-                    ingredientContent: !ingredient.isHeader,
-                    complete: getIngredientComplete(ingredientIdx),
-                  }"
-                  (click)="ingredientClicked(ingredient, ingredientIdx)"
-                ></p>
-              }
-              <p>
-                <a class="scale" (click)="changeScale()"
-                  >{{
-                    "pages.recipeDetails.scaleStatus"
-                      | translate: { scale: scaleDisplay }
-                  }}
-                  ·
-                  {{ unitSystemLabelKey | translate }}</a
-                >
-              </p>
-            </ion-label>
-          </ion-item>
-        </div>
-        <div class="instructionsCol">
-          <ion-item lines="none">
-            <ion-icon name="list-outline" slot="start" size="large"></ion-icon>
-            <ion-label class="section-title">
-              <p>{{ "pages.recipeDetails.instructions" | translate }}</p>
-            </ion-label>
-          </ion-item>
-          <ion-item class="instructions ion-text-wrap" lines="none">
-            <ion-label dir="auto">
-              @for (
-                instruction of instructions;
-                track instruction;
-                let instructionIdx = $index
-              ) {
-                <p class="instruction ion-text-wrap" dir="auto">
-                  @if (instruction.isHeader) {
+      <ingredients-instructions-layout>
+        <ion-item lines="none" ingredientsHeader>
+          <ion-icon
+            name="book-outline"
+            slot="start"
+            class="section-icon"
+          ></ion-icon>
+          <ion-label class="section-title">
+            <p>{{ "pages.recipeDetails.ingredients" | translate }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item
+          class="ingredients ion-text-wrap"
+          lines="none"
+          ingredientsContent
+        >
+          <ion-label dir="auto">
+            @for (
+              ingredient of ingredients;
+              track ingredient;
+              let ingredientIdx = $index
+            ) {
+              <p
+                [innerHTML]="ingredient.htmlContent"
+                dir="auto"
+                class="ingredient ion-text-wrap"
+                [ngClass]="{
+                  header: ingredient.isHeader,
+                  ingredientContent: !ingredient.isHeader,
+                  complete: getIngredientComplete(ingredientIdx),
+                }"
+                (click)="ingredientClicked(ingredient, ingredientIdx)"
+              ></p>
+            }
+            @if (!ingredients || ingredients.length === 0) {
+              <p>{{ "pages.recipeDetails.noIngredients" | translate }}</p>
+            }
+            <p>
+              <a class="scale" (click)="changeScale()"
+                >{{
+                  "pages.recipeDetails.scaleStatus"
+                    | translate: { scale: scaleDisplay }
+                }}
+                ·
+                {{ unitSystemLabelKey | translate }}</a
+              >
+            </p>
+          </ion-label>
+        </ion-item>
+        <ion-item lines="none" instructionsHeader>
+          <ion-icon
+            name="list-outline"
+            slot="start"
+            class="section-icon"
+          ></ion-icon>
+          <ion-label class="section-title">
+            <p>{{ "pages.recipeDetails.instructions" | translate }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-item
+          class="instructions ion-text-wrap"
+          lines="none"
+          instructionsContent
+        >
+          <ion-label dir="auto">
+            @for (
+              instruction of instructions;
+              track instruction;
+              let instructionIdx = $index
+            ) {
+              <p class="instruction ion-text-wrap" dir="auto">
+                @if (instruction.isHeader) {
+                  <span
+                    class="sectionHeader"
+                    [innerHTML]="instruction.htmlContent"
+                  ></span>
+                } @else {
+                  <span
+                    (click)="instructionClicked(instruction, instructionIdx)"
+                    [ngClass]="{
+                      complete: getInstructionComplete(instructionIdx),
+                    }"
+                  >
+                    <b>{{ instruction.count }} &nbsp;</b>
                     <span
-                      class="sectionHeader"
+                      class="instructionContent"
                       [innerHTML]="instruction.htmlContent"
                     ></span>
-                  } @else {
-                    <span
-                      (click)="instructionClicked(instruction, instructionIdx)"
-                      [ngClass]="{
-                        complete: getInstructionComplete(instructionIdx),
-                      }"
-                    >
-                      <b>{{ instruction.count }} &nbsp;</b>
-                      <span
-                        class="instructionContent"
-                        [innerHTML]="instruction.htmlContent"
-                      ></span>
-                    </span>
-                  }
-                </p>
-              }
-            </ion-label>
-          </ion-item>
-        </div>
-      </div>
+                  </span>
+                }
+              </p>
+            }
+            @if (!instructions || instructions.length === 0) {
+              <p>{{ "pages.recipeDetails.noInstructions" | translate }}</p>
+            }
+          </ion-label>
+        </ion-item>
+      </ingredients-instructions-layout>
 
       @if (notes) {
         <div class="notes ion-margin-top">
@@ -223,7 +241,7 @@
             <ion-icon
               name="document-text-outline"
               slot="start"
-              size="large"
+              class="section-icon"
             ></ion-icon>
             <ion-label class="section-title">
               <p>{{ "pages.recipeDetails.notes" | translate }}</p>
@@ -250,7 +268,7 @@
             <ion-icon
               name="fitness-outline"
               slot="start"
-              size="large"
+              class="section-icon"
             ></ion-icon>
             <ion-label class="section-title">
               <p>{{ "pages.recipeDetails.nutrition" | translate }}</p>
@@ -554,7 +572,7 @@
             <ion-icon
               name="pricetag-outline"
               slot="start"
-              size="large"
+              class="section-icon"
             ></ion-icon>
             <ion-label class="section-title">
               <p>{{ "pages.discoverRecipe.categories" | translate }}</p>
@@ -580,7 +598,11 @@
         <br />
         <div class="linked-recipes">
           <ion-item lines="none">
-            <ion-icon name="link-outline" slot="start" size="large"></ion-icon>
+            <ion-icon
+              name="link-outline"
+              slot="start"
+              class="section-icon"
+            ></ion-icon>
             <ion-label class="section-title">
               <p>{{ "pages.discoverRecipe.linkedRecipes" | translate }}</p>
             </ion-label>
@@ -615,7 +637,7 @@
       }
 
       @if (recipe.modifiedAt) {
-        <p class="discover-action-row modified">
+        <p class="modified">
           {{
             "pages.discoverRecipe.modified"
               | translate: { date: formatDate(recipe.modifiedAt) }

@@ -1,15 +1,28 @@
-import { Component, Input, Output, EventEmitter, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { LoadingService } from "../../services/loading.service";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { ServerActionsService } from "../../services/server-actions.service";
 import type { LabelSummary } from "@recipesage/prisma";
 import {
+  IonList,
+  IonItemGroup,
   IonItem,
   IonIcon,
   IonLabel,
   IonSearchbar,
-} from "@ionic/angular/standalone";
-import { folderOpenOutline, pricetagOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import {
+  folderOpenOutline,
+  pricetagOutline,
+  closeOutline,
+} from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 @Component({
@@ -17,7 +30,16 @@ import { addIcons } from "ionicons";
   selector: "select-label",
   templateUrl: "select-label.component.html",
   styleUrls: ["./select-label.component.scss"],
-  imports: [...SHARED_UI_IMPORTS, IonItem, IonIcon, IonLabel, IonSearchbar],
+  changeDetection: ChangeDetectionStrategy.Eager,
+  imports: [
+    ...SHARED_UI_IMPORTS,
+    IonList,
+    IonItemGroup,
+    IonItem,
+    IonIcon,
+    IonLabel,
+    IonSearchbar,
+  ],
 })
 export class SelectLabelComponent {
   private loadingService = inject(LoadingService);
@@ -42,7 +64,7 @@ export class SelectLabelComponent {
   results: LabelSummary[] = [];
 
   constructor() {
-    addIcons({ folderOpenOutline, pricetagOutline });
+    addIcons({ folderOpenOutline, pricetagOutline, closeOutline });
     this.load();
   }
 

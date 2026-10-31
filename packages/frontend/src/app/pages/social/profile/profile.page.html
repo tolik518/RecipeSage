@@ -1,4 +1,4 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="nav">
     <ion-buttons slot="start">
       @if (!isLoggedIn()) {
@@ -10,7 +10,10 @@
     </ion-buttons>
 
     <ion-title>
-      {{ "pages.profile.title" | translate: { name: profile?.name } }}
+      {{
+        "pages.profile.title"
+          | translate: { name: $safeNavigationMigration(profile?.name) }
+      }}
     </ion-title>
 
     @if (isLoggedIn() && profile && !isMyProfile()) {
@@ -54,8 +57,9 @@
           >
             <img
               src="{{
-                profile.profileImages.at(0)?.image?.location
-                  | resolveStorageLocation
+                $safeNavigationMigration(
+                  profile.profileImages.at(0)?.image?.location
+                ) | resolveStorageLocation
               }}"
             />
           </ion-thumbnail>
@@ -68,11 +72,21 @@
             <h5 class="handle">&commat;{{ profile.handle }}</h5>
           </ion-item>
           <div class="profile-icon-buttons">
-            <ion-item lines="none" (click)="shareProfile()" button>
+            <ion-item
+              lines="none"
+              (click)="shareProfile()"
+              button
+              [detail]="false"
+            >
               <ion-icon name="share-social-outline"></ion-icon>
             </ion-item>
             @if (isLoggedIn() && !isMyProfile() && !isBlockedByMe) {
-              <ion-item lines="none" (click)="sendMessage()" button>
+              <ion-item
+                lines="none"
+                (click)="sendMessage()"
+                button
+                [detail]="false"
+              >
                 <ion-icon name="mail-outline"></ion-icon>
               </ion-item>
             }
@@ -107,8 +121,9 @@
                     <ion-avatar slot="start">
                       <img
                         [src]="
-                          item.recipe?.recipeImages?.at(0)?.image?.location
-                            | resolveStorageLocation
+                          $safeNavigationMigration(
+                            item.recipe?.recipeImages?.at(0)?.image?.location
+                          ) | resolveStorageLocation
                         "
                       />
                     </ion-avatar>
@@ -183,7 +198,7 @@
 </ion-content>
 
 @if (profile && !isMyProfile()) {
-  <ion-footer>
+  <ion-footer class="ion-no-border">
     @if (isLoggedIn()) {
       <ion-toolbar class="ion-padding-horizontal">
         <div class="page-wrapper">

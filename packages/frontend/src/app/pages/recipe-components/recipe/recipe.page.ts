@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
   NavController,
@@ -6,7 +6,7 @@ import {
   ToastController,
   ModalController,
   PopoverController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import dayjs from "dayjs";
 
@@ -51,6 +51,7 @@ import { ServerActionsService } from "../../../services/server-actions.service";
 import { Title } from "@angular/platform-browser";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { RatingComponent } from "../../../components/rating/rating.component";
+import { IngredientsInstructionsLayoutComponent } from "../../../components/ingredients-instructions-layout/ingredients-instructions-layout.component";
 import {
   IonHeader,
   IonToolbar,
@@ -68,7 +69,7 @@ import {
   IonCol,
   IonAvatar,
   IonChip,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   bookOutline,
   calendarOutline,
@@ -97,9 +98,11 @@ import { resolveStorageLocation } from "../../../utils/resolveStorageLocation";
   selector: "page-recipe",
   templateUrl: "recipe.page.html",
   styleUrls: ["recipe.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     RatingComponent,
+    IngredientsInstructionsLayoutComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -850,6 +853,7 @@ export class RecipePage {
 
     const imageViewerModal = await this.modalCtrl.create({
       component: ImageViewerComponent,
+      cssClass: "imageViewerModal",
       componentProps: {
         imageUrls: this.sortedRecipeImages().map(
           (recipeImage) => recipeImage.image.location,

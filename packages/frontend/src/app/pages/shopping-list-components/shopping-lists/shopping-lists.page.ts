@@ -1,9 +1,14 @@
-import { Component, computed, inject } from "@angular/core";
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import {
   NavController,
   ModalController,
   ToastController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { WebsocketService } from "../../../services/websocket.service";
 import { LoadingService } from "../../../services/loading.service";
 import { UtilService, RouteMap } from "../../../services/util.service";
@@ -11,6 +16,7 @@ import { UtilService, RouteMap } from "../../../services/util.service";
 import { NewShoppingListModalPage } from "../new-shopping-list-modal/new-shopping-list-modal.page";
 import { ShoppingListIgnoreModalPage } from "../shopping-list-ignore-modal/shopping-list-ignore-modal.page";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import { NullStateComponent } from "../../../components/null-state/null-state.component";
 import { ServerActionsService } from "../../../services/server-actions.service";
 import {
@@ -25,13 +31,14 @@ import {
   IonPopover,
   IonListHeader,
   IonList,
+  IonItemGroup,
   IonItem,
   IonLabel,
   IonBadge,
   IonFab,
   IonFabButton,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   addOutline,
   banOutline,
@@ -46,6 +53,7 @@ import { addIcons } from "ionicons";
   selector: "page-shopping-lists",
   templateUrl: "shopping-lists.page.html",
   styleUrls: ["shopping-lists.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,
@@ -60,6 +68,7 @@ import { addIcons } from "ionicons";
     IonPopover,
     IonListHeader,
     IonList,
+    IonItemGroup,
     IonItem,
     IonLabel,
     IonBadge,
@@ -76,6 +85,8 @@ export class ShoppingListsPage {
   websocketService = inject(WebsocketService);
   loadingService = inject(LoadingService);
   utilService = inject(UtilService);
+
+  isNativeIOS = IS_NATIVE_IOS;
 
   private meQuery = this.serverActionsService.users.getMe();
   me = this.meQuery.value;

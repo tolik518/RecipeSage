@@ -1,4 +1,9 @@
-import { Component, inject } from "@angular/core";
+import {
+  Component,
+  ViewChild,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import dayjs from "dayjs";
 import {
@@ -11,7 +16,7 @@ import {
   PopoverController,
   LoadingController,
   type AccordionGroupChangeEventDetail,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import {
   Camera,
@@ -83,7 +88,7 @@ import {
   IonLabel,
   IonBadge,
   IonAvatar,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   cameraOutline,
   closeOutline,
@@ -99,6 +104,7 @@ import { addIcons } from "ionicons";
   selector: "page-edit-recipe",
   templateUrl: "edit-recipe.page.html",
   styleUrls: ["edit-recipe.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     SelectMultipleItemsComponent,
@@ -145,7 +151,11 @@ export class EditRecipePage {
   private capabilitiesService = inject(CapabilitiesService);
   private preferencesService = inject(PreferencesService);
 
+  @ViewChild(MultiImageUploadComponent, { static: true })
+  multiImageUpload!: MultiImageUploadComponent;
+
   saving = false;
+  imageUploading = false;
   defaultBackHref: string = RouteMap.HomePage.getPath("main");
 
   nutritionAccordionValue: string | null = this.preferencesService.preferences[
@@ -562,9 +572,11 @@ export class EditRecipePage {
       loading.dismiss();
     }
 
-    const imageResponse = await this.imageService.create(files[0], {
-      "*": () => {},
-    });
+    const imageResponse = await this.multiImageUpload.trackUpload(
+      this.imageService.create(files[0], {
+        "*": () => {},
+      }),
+    );
 
     if (imageResponse.success) {
       this.images.push(imageResponse.data);
@@ -1558,9 +1570,11 @@ export class EditRecipePage {
       loading.dismiss();
     }
 
-    const imageResponse = await this.imageService.create(files[0], {
-      "*": () => {},
-    });
+    const imageResponse = await this.multiImageUpload.trackUpload(
+      this.imageService.create(files[0], {
+        "*": () => {},
+      }),
+    );
 
     if (imageResponse.success) {
       this.images.push(imageResponse.data);
@@ -1799,15 +1813,16 @@ export class EditRecipePage {
       await Promise.race([
         new Promise((resolve) => setTimeout(resolve, IMAGE_LOADING_TIMEOUT)),
         (async () => {
-          const imageResponse =
-            await this.serverActionsService.images.createRecipeImageFromUrl(
+          const imageResponse = await this.multiImageUpload.trackUpload(
+            this.serverActionsService.images.createRecipeImageFromUrl(
               {
                 url: response.imageURL,
               },
               {
                 "*": () => {},
               },
-            );
+            ),
+          );
           if (imageResponse) this.images.push(imageResponse);
         })(),
       ]);
@@ -1835,17 +1850,8 @@ export class EditRecipePage {
     if (!imageUrl) return;
 
     if (this.isValidHttpUrl(imageUrl)) {
-      const downloading = await this.translate
-        .get("pages.editRecipe.addImage.downloading")
-        .toPromise();
-
-      const loading = await this.loadingCtrl.create({
-        message: downloading,
-      });
-      await loading.present();
-
-      const response =
-        await this.serverActionsService.images.createRecipeImageFromUrl(
+      const response = await this.multiImageUpload.trackUpload(
+        this.serverActionsService.images.createRecipeImageFromUrl(
           {
             url: imageUrl,
           },
@@ -1853,13 +1859,12 @@ export class EditRecipePage {
             400: () => this.presentAddImageByUrlFailed(),
             415: () => this.presentAddImageByUrlFailed(),
           },
-        );
+        ),
+      );
       if (response) {
         this.images.push(response);
         this.markAsDirty();
       }
-
-      loading.dismiss();
     } else {
       const header = await this.translate.get("generic.error").toPromise();
       const invalidUrl = await this.translate

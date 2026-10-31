@@ -5,6 +5,7 @@ import {
   Input,
   inject,
   type OnInit,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 
 import { LoadingService } from "../../services/loading.service";
@@ -12,6 +13,8 @@ import { ServerActionsService } from "../../services/server-actions.service";
 import type { UserPublic } from "@recipesage/prisma";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import {
+  IonList,
+  IonItemGroup,
   IonItem,
   IonAvatar,
   IonLabel,
@@ -19,8 +22,8 @@ import {
   IonSpinner,
   IonIcon,
   type SearchbarCustomEvent,
-} from "@ionic/angular/standalone";
-import { folderOpenOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import { folderOpenOutline, closeOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 const PAUSE_BEFORE_SEARCH = 500; // Ms
@@ -30,8 +33,11 @@ const PAUSE_BEFORE_SEARCH = 500; // Ms
   selector: "select-user",
   templateUrl: "select-user.component.html",
   styleUrls: ["./select-user.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
+    IonList,
+    IonItemGroup,
     IonItem,
     IonAvatar,
     IonLabel,
@@ -42,7 +48,7 @@ const PAUSE_BEFORE_SEARCH = 500; // Ms
 })
 export class SelectUserComponent implements OnInit {
   constructor() {
-    addIcons({ folderOpenOutline });
+    addIcons({ folderOpenOutline, closeOutline });
   }
 
   private serverActionsService = inject(ServerActionsService);

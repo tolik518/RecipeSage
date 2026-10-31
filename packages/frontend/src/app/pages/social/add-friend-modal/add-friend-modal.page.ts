@@ -1,10 +1,10 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import {
   NavController,
   ModalController,
   ToastController,
   AlertController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { ServerActionsService } from "../../../services/server-actions.service";
@@ -20,10 +20,10 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonItem,
   IonLabel,
+  IonNote,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { closeOutline, openOutline, sendOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -32,6 +32,7 @@ import { addIcons } from "ionicons";
   selector: "page-add-friend-modal",
   templateUrl: "add-friend-modal.page.html",
   styleUrls: ["add-friend-modal.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     SelectUserComponent,
@@ -42,8 +43,8 @@ import { addIcons } from "ionicons";
     IonButton,
     IonIcon,
     IonContent,
-    IonItem,
     IonLabel,
+    IonNote,
     IonFooter,
   ],
 })

@@ -1,21 +1,31 @@
-import { Component, Input, inject } from "@angular/core";
-import { PopoverController } from "@ionic/angular/standalone";
+import {
+  Component,
+  Input,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { PopoverController } from "@ionic/angular";
 
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { CookingToolbarService } from "../../../services/cooking-toolbar.service";
 import { PreferencesService } from "../../../services/preferences.service";
 import { WakeLockService } from "../../../services/wakelock.service";
-import { RecipeDetailsPreferenceKey } from "@recipesage/util/shared";
+import {
+  RecipeDetailsPreferenceKey,
+  RecipeDetailsLayoutOptions,
+} from "@recipesage/util/shared";
 import {
   IonList,
   IonListHeader,
   IonItem,
   IonLabel,
   IonToggle,
-  IonButton,
   IonIcon,
-} from "@ionic/angular/standalone";
+  IonSelect,
+  IonSelectOption,
+} from "@ionic/angular";
 import {
+  browsersOutline,
   createOutline,
   eyeOutline,
   flagOutline,
@@ -41,6 +51,7 @@ export type DiscoverRecipePopoverAction =
   selector: "page-discover-recipe-popover",
   templateUrl: "discover-recipe-popover.page.html",
   styleUrls: ["discover-recipe-popover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonList,
@@ -48,8 +59,9 @@ export type DiscoverRecipePopoverAction =
     IonItem,
     IonLabel,
     IonToggle,
-    IonButton,
     IonIcon,
+    IonSelect,
+    IonSelectOption,
   ],
 })
 export class DiscoverRecipePopoverPage {
@@ -63,11 +75,13 @@ export class DiscoverRecipePopoverPage {
 
   preferences = this.preferencesService.preferences;
   preferenceKeys = RecipeDetailsPreferenceKey;
+  layoutOptions = RecipeDetailsLayoutOptions;
 
   wakeLockCapable: boolean;
 
   constructor() {
     addIcons({
+      browsersOutline,
       createOutline,
       eyeOutline,
       flagOutline,

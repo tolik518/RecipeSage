@@ -17,6 +17,7 @@ import {
   OfflineModePromptOptions,
   PreferencesSync,
   RecipeDetailsPreferenceKey,
+  RecipeDetailsLayoutOptions,
   ShoppingListPreferenceKey,
   ShoppingListSortOptions,
   StartPageOptions,
@@ -74,6 +75,9 @@ const appPreferencesSchema = z
 
     [RecipeDetailsPreferenceKey.EnableWakeLock]: z.boolean().catch(true),
     [RecipeDetailsPreferenceKey.AutoExpandNutrition]: z.boolean().catch(false),
+    [RecipeDetailsPreferenceKey.Layout]: z
+      .enum(RecipeDetailsLayoutOptions)
+      .catch(RecipeDetailsLayoutOptions.Automatic),
 
     [CookModePreferenceKey.FontSize]: z
       .enum(SupportedFontSize)

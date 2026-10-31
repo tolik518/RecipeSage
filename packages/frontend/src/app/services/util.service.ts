@@ -5,11 +5,13 @@ import {
   SupportedFontSize,
   SupportedLanguages,
 } from "@recipesage/util/shared";
-import { NavController } from "@ionic/angular/standalone";
+import { NavController } from "@ionic/angular";
 import dayjs from "dayjs";
 import { serverConfig, PUBLIC_WEB_ORIGIN } from "../utils/serverConfig";
 import { getIsElectron } from "../utils/electron";
+import { USE_IOS_MODE } from "../utils/useIOSMode";
 import { Capacitor } from "@capacitor/core";
+import { EventName, EventService } from "./event.service";
 
 export interface RecipeTemplateModifiers {
   version?: string;
@@ -66,7 +68,7 @@ export const RouteMap = {
   },
   LabelsPage: {
     getPath() {
-      return `labels`;
+      return `/labels`;
     },
     path: "labels",
   },
@@ -234,25 +236,25 @@ export const RouteMap = {
   },
   MyProfilePage: {
     getPath() {
-      return `people/my-profile`;
+      return `/people/my-profile`;
     },
     path: "people/my-profile",
   },
   ProfilePage: {
     getPath(handle: string) {
-      return `people/${handle}`;
+      return `/people/${handle}`;
     },
     path: "people/:handle",
   },
   PeoplePage: {
     getPath() {
-      return `people`;
+      return `/people`;
     },
     path: "people",
   },
   BlockedUsersPage: {
     getPath() {
-      return `people/blocked-users`;
+      return `/people/blocked-users`;
     },
     path: "people/blocked-users",
   },
@@ -285,6 +287,12 @@ export const RouteMap = {
       return `/tools`;
     },
     path: "tools",
+  },
+  MorePage: {
+    getPath() {
+      return `/more`;
+    },
+    path: "more",
   },
   CookbookGeneratorPage: {
     getPath() {
@@ -486,13 +494,21 @@ const rtlLanguages = [SupportedLanguages.HE, SupportedLanguages.AR_SA];
 })
 export class UtilService {
   private translate = inject(TranslateService);
+  private events = inject(EventService);
 
   memoizedFormattedDates: Map<string, string> = new Map();
+
+  private appTheme = AppTheme.Default;
+  private prefersDarkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
   constructor() {
     setInterval(() => {
       this.memoizedFormattedDates.clear();
     }, 1000 * 60);
+
+    this.prefersDarkQuery.addEventListener("change", () => {
+      this.updateIonPalette();
+    });
   }
 
   getCurrentLocale(): string {
@@ -564,12 +580,41 @@ export class UtilService {
   }
 
   setFontSize(fontSize: SupportedFontSize) {
+    if (window.document.documentElement.style.fontSize === fontSize) return;
+
     window.document.documentElement.style.fontSize = fontSize;
+    this.events.publish(EventName.ApplicationFontSizeChanged);
   }
 
   setAppTheme(theme: AppTheme) {
     const bodyClasses = document.body.className.replace(/theme-\S*/, "");
     document.body.className = `${bodyClasses} theme-${theme}`;
+
+    this.appTheme = theme;
+    this.updateIonPalette();
+  }
+
+  private updateIonPalette() {
+    const isDark =
+      this.appTheme === AppTheme.Dark ||
+      this.appTheme === AppTheme.Black ||
+      this.appTheme === AppTheme.Midnight ||
+      (this.appTheme === AppTheme.Default && this.prefersDarkQuery.matches);
+
+    document.documentElement.classList.toggle("ion-palette-dark", isDark);
+    this.updateThemeColor();
+  }
+
+  private updateThemeColor() {
+    if (!USE_IOS_MODE) return;
+
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    const backgroundColor = getComputedStyle(document.body)
+      .getPropertyValue("--ion-background-color")
+      .trim();
+    if (themeColorMeta && backgroundColor) {
+      themeColorMeta.setAttribute("content", backgroundColor);
+    }
   }
 
   getToken(): string | null {

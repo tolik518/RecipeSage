@@ -1,7 +1,13 @@
-import { Component, inject, Input } from "@angular/core";
-import { ModalController } from "@ionic/angular/standalone";
+import {
+  Component,
+  inject,
+  Input,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { ModalController } from "@ionic/angular";
 
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { TextAreaComponent } from "../../../components/forms/text-area/text-area.component";
 import { ServerActionsService } from "../../../services/server-actions.service";
 import {
   IonHeader,
@@ -11,11 +17,10 @@ import {
   IonButton,
   IonIcon,
   IonContent,
-  IonItem,
   IonLabel,
-  IonTextarea,
+  IonNote,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { closeOutline, saveOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -24,8 +29,10 @@ import { addIcons } from "ionicons";
   selector: "page-shopping-list-category-order-modal",
   templateUrl: "shopping-list-category-order-modal.page.html",
   styleUrls: ["shopping-list-category-order-modal.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
+    TextAreaComponent,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -33,9 +40,8 @@ import { addIcons } from "ionicons";
     IonButton,
     IonIcon,
     IonContent,
-    IonItem,
     IonLabel,
-    IonTextarea,
+    IonNote,
     IonFooter,
   ],
 })

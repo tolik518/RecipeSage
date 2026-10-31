@@ -15,13 +15,17 @@ import {
   TitleStrategy,
   withPreloading,
 } from "@angular/router";
-import {
-  IonicRouteStrategy,
-  provideIonicAngular,
-} from "@ionic/angular/standalone";
+import { IonicRouteStrategy, provideIonicAngular } from "@ionic/angular";
 import { RouteReuseStrategy } from "@angular/router";
+import {
+  iosTransitionAnimation,
+  popoverEnterAnimation,
+  popoverLeaveAnimation,
+} from "@rdlabo/ionic-theme-ios27";
+import { mdTransitionAnimation } from "@rdlabo/ionic-theme-md3";
 
 import { AppComponent } from "./app/app.component";
+import { USE_IOS_MODE } from "./app/utils/useIOSMode";
 import { appRoutes } from "./app/app.routes";
 
 import { provideTranslate } from "./app/providers/translate.provider";
@@ -39,12 +43,26 @@ if (environment.production) {
   enableProdMode();
 }
 
+const getThemeAnimations = () => {
+  if (!USE_IOS_MODE) return { navAnimation: mdTransitionAnimation };
+
+  return {
+    navAnimation: iosTransitionAnimation,
+    popoverEnter: popoverEnterAnimation,
+    popoverLeave: popoverLeaveAnimation,
+  };
+};
+
 bootstrapApplication(AppComponent, {
   providers: [
     provideZoneChangeDetection(),
     provideRouter(appRoutes, withPreloading(PreloadAllModules)),
     { provide: TitleStrategy, useClass: CustomTitleStrategy },
-    provideIonicAngular(),
+    provideIonicAngular({
+      mode: USE_IOS_MODE ? "ios" : "md",
+      ...getThemeAnimations(),
+      backButtonText: "",
+    }),
     provideTranslate(),
     provideLoadingBar(),
     {

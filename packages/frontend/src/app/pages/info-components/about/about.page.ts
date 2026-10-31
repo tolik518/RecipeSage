@@ -1,5 +1,6 @@
-import { Component, inject } from "@angular/core";
-import { NavController } from "@ionic/angular/standalone";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Router } from "@angular/router";
+import { NavController } from "@ionic/angular";
 
 import { RouteMap } from "../../../services/util.service";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
@@ -9,12 +10,16 @@ import {
   IonToolbar,
   IonButtons,
   IonMenuButton,
+  IonBackButton,
   IonTitle,
   IonContent,
   IonList,
+  IonListHeader,
+  IonItemGroup,
+  IonLabel,
   IonItem,
   IonIcon,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   archiveOutline,
   heartOutline,
@@ -30,6 +35,7 @@ import { addIcons } from "ionicons";
   selector: "page-about",
   templateUrl: "about.page.html",
   styleUrls: ["about.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     SocialLinksComponent,
@@ -37,9 +43,13 @@ import { addIcons } from "ionicons";
     IonToolbar,
     IonButtons,
     IonMenuButton,
+    IonBackButton,
     IonTitle,
     IonContent,
     IonList,
+    IonListHeader,
+    IonItemGroup,
+    IonLabel,
     IonItem,
     IonIcon,
   ],
@@ -54,9 +64,17 @@ export class AboutPage {
       personOutline,
       sendOutline,
     });
+
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
   }
 
   navCtrl = inject(NavController);
+  router = inject(Router);
+
+  showBack = false;
+  defaultBackHref: string = RouteMap.MorePage.getPath();
 
   goToAboutDetails() {
     this.navCtrl.navigateForward(RouteMap.AboutDetailsPage.getPath());

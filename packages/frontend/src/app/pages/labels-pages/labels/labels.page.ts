@@ -1,10 +1,11 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Router } from "@angular/router";
 import {
   AlertController,
   PopoverController,
   ModalController,
   NavController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { LoadingService } from "../../../services/loading.service";
@@ -19,25 +20,30 @@ import type { LabelGroupSummary, LabelSummary } from "@recipesage/prisma";
 import { NewLabelItemModalPage } from "../new-label-item-modal/new-label-item-modal.page";
 import { ManageLabelGroupModalPage } from "../manage-label-group-modal/manage-label-group-modal.page";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import { NullStateComponent } from "../../../components/null-state/null-state.component";
 import {
   IonHeader,
   IonToolbar,
   IonButtons,
   IonMenuButton,
+  IonBackButton,
   IonButton,
   IonIcon,
   IonTitle,
   IonContent,
   IonSearchbar,
   IonList,
+  IonListHeader,
+  IonItemGroup,
+  IonNote,
   IonItem,
   IonLabel,
   IonBadge,
   IonFab,
   IonFabButton,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   addOutline,
   closeOutline,
@@ -55,6 +61,7 @@ import { addIcons } from "ionicons";
   selector: "page-labels",
   templateUrl: "labels.page.html",
   styleUrls: ["labels.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,
@@ -62,12 +69,16 @@ import { addIcons } from "ionicons";
     IonToolbar,
     IonButtons,
     IonMenuButton,
+    IonBackButton,
     IonButton,
     IonIcon,
     IonTitle,
     IonContent,
     IonSearchbar,
     IonList,
+    IonListHeader,
+    IonItemGroup,
+    IonNote,
     IonItem,
     IonLabel,
     IonBadge,
@@ -88,9 +99,14 @@ export class LabelsPage {
       pricetagsOutline,
       trashOutline,
     });
+
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
   }
 
   private navCtrl = inject(NavController);
+  private router = inject(Router);
   private translate = inject(TranslateService);
   private popoverCtrl = inject(PopoverController);
   private loadingService = inject(LoadingService);
@@ -99,6 +115,11 @@ export class LabelsPage {
   private utilService = inject(UtilService);
   private preferencesService = inject(PreferencesService);
   private serverActionsService = inject(ServerActionsService);
+
+  isNativeIOS = IS_NATIVE_IOS;
+
+  showBack = false;
+  defaultBackHref: string = RouteMap.MorePage.getPath();
 
   preferences = this.preferencesService.preferences;
   preferenceKeys = ManageLabelsPreferenceKey;

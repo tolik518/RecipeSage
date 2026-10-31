@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   signal,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
@@ -13,7 +14,7 @@ import {
   PopoverController,
   AlertController,
   ToastController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import dayjs from "dayjs";
 import { TranslateService } from "@ngx-translate/core";
 
@@ -44,6 +45,7 @@ import { ServerActionsService } from "../../../services/server-actions.service";
 import type { MealPlanItemSummary } from "@recipesage/prisma";
 import { Title } from "@angular/platform-browser";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import {
   IonHeader,
   IonToolbar,
@@ -61,7 +63,7 @@ import {
   IonFab,
   IonFabButton,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   addOutline,
   calendarOutline,
@@ -76,6 +78,7 @@ import { addIcons } from "ionicons";
   selector: "page-meal-plan",
   templateUrl: "meal-plan.page.html",
   styleUrls: ["meal-plan.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     MealCalendarComponent,
@@ -113,6 +116,8 @@ export class MealPlanPage {
   private toastCtrl = inject(ToastController);
   private titleService = inject(Title);
   private utilService = inject(UtilService);
+
+  isNativeIOS = IS_NATIVE_IOS;
 
   defaultBackHref: string = RouteMap.MealPlansPage.getPath();
 
@@ -401,6 +406,8 @@ export class MealPlanPage {
   }
 
   async presentPopover(event: Event) {
+    const viewTypeBefore = this.preferences[MealPlanPreferenceKey.ViewType];
+
     const popover = await this.popoverCtrl.create({
       component: MealPlanPopoverPage,
       componentProps: {
@@ -421,6 +428,13 @@ export class MealPlanPage {
     const { data } = await popover.onDidDismiss();
 
     if (data?.reload) {
+      const viewTypeAfter = this.preferences[MealPlanPreferenceKey.ViewType];
+      if (
+        viewTypeAfter !== viewTypeBefore &&
+        viewTypeAfter === MealPlanViewTypeOptions.List
+      ) {
+        this.setSelectedDays([]);
+      }
       this.loadWithProgress();
       this.mealPlanCalendar?.generateCalendar();
     }
@@ -1079,8 +1093,9 @@ export class MealPlanPage {
 
     this.pastEntries = this.buildPastEntries();
 
-    this.selectedDays = [];
-    this.selectedDaysSet = new Set();
+    this.setSelectedDays(
+      this.selectedDays.filter((dateStr) => this.listItemsByDate.has(dateStr)),
+    );
   }
 
   private buildPastEntries() {

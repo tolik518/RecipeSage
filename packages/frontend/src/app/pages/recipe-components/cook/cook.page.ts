@@ -5,13 +5,14 @@ import {
   OnDestroy,
   ViewChild,
   inject,
+  ChangeDetectionStrategy,
 } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
   NavController,
   ModalController,
   ToastController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { linkifyHtml } from "../../../utils/linkify";
@@ -53,7 +54,7 @@ import {
   IonSpinner,
   IonLabel,
   IonModal,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   alertCircleOutline,
   bulbOutline,
@@ -80,6 +81,7 @@ interface CookableRecipe {
   selector: "page-cook",
   templateUrl: "cook.page.html",
   styleUrls: ["cook.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,

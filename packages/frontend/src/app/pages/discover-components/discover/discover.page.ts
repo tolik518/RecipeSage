@@ -1,6 +1,6 @@
-import { Component, inject } from "@angular/core";
-import { ActivatedRoute } from "@angular/router";
-import { NavController, PopoverController } from "@ionic/angular/standalone";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { ActivatedRoute, Router } from "@angular/router";
+import { NavController, PopoverController } from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import { Datasource, UiScrollModule } from "ngx-ui-scroll";
 import {
@@ -13,12 +13,15 @@ import { RouteMap, UtilService } from "../../../services/util.service";
 import { LoadingService } from "../../../services/loading.service";
 import { PreferencesService } from "../../../services/preferences.service";
 import { ServerActionsService } from "../../../services/server-actions.service";
+import { EventName, EventService } from "../../../services/event.service";
+import { NativeTabBarService } from "../../../services/native-tab-bar.service";
 import type { RouterOutputs } from "../../../services/server-actions/actions-base";
 import {
   getDiscoverLanguageOptions,
   getDefaultDiscoverLanguages,
   DiscoverLanguageOption,
 } from "../../../utils/discoverLanguages";
+import { getScrollbarWidth } from "../../../utils/getScrollbarWidth";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { RatingComponent } from "../../../components/rating/rating.component";
 import {
@@ -36,13 +39,14 @@ import {
   IonToolbar,
   IonButtons,
   IonMenuButton,
+  IonBackButton,
   IonTitle,
   IonContent,
   IonSearchbar,
   IonButton,
   IonIcon,
-} from "@ionic/angular/standalone";
-import { searchOutline, optionsOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import { searchOutline, optionsOutline, closeOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 type DiscoverRecipeSummary =
@@ -52,12 +56,16 @@ type DiscoverRecipeAuthor = DiscoverRecipeSummary["author"];
 const PAGE_SIZE = 40;
 const TILE_WIDTH = 200;
 const TILE_PADD = 20;
+const MOBILE_TWO_COLUMN_MIN_WIDTH = 375;
+const TWO_COLUMN_TILE_GUTTER = 32;
+const RESIZE_DEBOUNCE_MS = 150;
 
 @Component({
   standalone: true,
   selector: "page-discover",
   templateUrl: "discover.page.html",
   styleUrls: ["discover.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     RatingComponent,
@@ -66,6 +74,7 @@ const TILE_PADD = 20;
     IonToolbar,
     IonButtons,
     IonMenuButton,
+    IonBackButton,
     IonTitle,
     IonContent,
     IonSearchbar,
@@ -75,6 +84,7 @@ const TILE_PADD = 20;
 })
 export class DiscoverPage {
   private route = inject(ActivatedRoute);
+  private router = inject(Router);
   private navCtrl = inject(NavController);
   private popoverCtrl = inject(PopoverController);
   private translate = inject(TranslateService);
@@ -82,9 +92,14 @@ export class DiscoverPage {
   private loadingService = inject(LoadingService);
   private preferencesService = inject(PreferencesService);
   private serverActionsService = inject(ServerActionsService);
+  private events = inject(EventService);
+  private nativeTabBarService = inject(NativeTabBarService);
 
   preferences = this.preferencesService.preferences;
   preferenceKeys = MyRecipesPreferenceKey;
+
+  showBack = false;
+  defaultBackHref: string = RouteMap.MorePage.getPath();
 
   languageOptions: DiscoverLanguageOption[] = [];
 
@@ -105,6 +120,7 @@ export class DiscoverPage {
   private hasEntered = false;
   private categoriesParam: string | null = null;
   tileColCount = 1;
+  tileWidth = TILE_WIDTH;
 
   datasource = new Datasource<DiscoverRecipeSummary>({
     get: async (index: number, count: number) => {
@@ -142,13 +158,17 @@ export class DiscoverPage {
   });
 
   constructor() {
-    addIcons({ searchOutline, optionsOutline });
+    addIcons({ searchOutline, optionsOutline, closeOutline });
     this.languageOptions = getDiscoverLanguageOptions(
       this.utilService.getCurrentLocale(),
     );
     this.selectedLanguages = getDefaultDiscoverLanguages(
       this.utilService.getCurrentLocale(),
     );
+
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
   }
 
   ionViewWillEnter() {
@@ -162,40 +182,92 @@ export class DiscoverPage {
         .filter((category) => category.length > 0);
     }
 
-    window.addEventListener("resize", this.updateTileColCount);
-    const tileColCountChanged = this.computeTileColCount();
+    window.addEventListener("resize", this.onWindowResize);
+    this.events.subscribe(
+      [
+        EventName.ApplicationSplitPaneChanged,
+        EventName.ApplicationVerticalBarInsetChanged,
+        EventName.ApplicationFontSizeChanged,
+      ],
+      this.updateLayout,
+    );
+    this.updateLayout();
 
-    if (!this.hasEntered || categoriesParamChanged || tileColCountChanged) {
+    if (!this.hasEntered || categoriesParamChanged) {
       this.hasEntered = true;
       this.reload();
     }
   }
 
   ionViewWillLeave() {
-    window.removeEventListener("resize", this.updateTileColCount);
+    window.removeEventListener("resize", this.onWindowResize);
+    this.events.unsubscribe(
+      [
+        EventName.ApplicationSplitPaneChanged,
+        EventName.ApplicationVerticalBarInsetChanged,
+        EventName.ApplicationFontSizeChanged,
+      ],
+      this.updateLayout,
+    );
+    clearTimeout(this.resizeTimeout);
   }
 
-  private computeTileColCount(): boolean {
+  private resizeTimeout: NodeJS.Timeout | undefined;
+  private onWindowResize = () => {
+    clearTimeout(this.resizeTimeout);
+    this.resizeTimeout = setTimeout(this.updateLayout, RESIZE_DEBOUNCE_MS);
+  };
+
+  private lastLayoutPageWidth?: number;
+  private lastLayoutFontSize?: string;
+
+  updateLayout = () => {
     const isSidebarEnabled =
       this.preferences[GlobalPreferenceKey.EnableSplitPane];
     const isSidebarOpen = window.innerWidth >= 1024; // split pane "when" in app.component.html
     const sidebarWidth = isSidebarEnabled && isSidebarOpen ? 300 : 0;
-    const pageWidth = window.innerWidth - sidebarWidth;
+    const pageWidth =
+      window.innerWidth -
+      sidebarWidth -
+      this.nativeTabBarService.getHorizontalContentInset();
+    const minimumColumnCount = pageWidth >= MOBILE_TWO_COLUMN_MIN_WIDTH ? 2 : 1;
     const tileColCount = Math.max(
       Math.floor(pageWidth / (TILE_WIDTH + TILE_PADD)),
-      1,
+      minimumColumnCount,
     );
-    if (tileColCount !== this.tileColCount) {
-      this.tileColCount = tileColCount;
-      return true;
-    }
-    return false;
-  }
+    const tileWidth =
+      tileColCount === 2
+        ? Math.min(
+            TILE_WIDTH,
+            Math.floor(
+              (pageWidth - getScrollbarWidth() - TWO_COLUMN_TILE_GUTTER) / 2,
+            ),
+          )
+        : TILE_WIDTH;
+    const fontSize = getComputedStyle(document.documentElement).fontSize;
 
-  updateTileColCount = () => {
-    if (this.computeTileColCount()) {
-      this.reload();
+    if (
+      tileColCount === this.tileColCount &&
+      tileWidth === this.tileWidth &&
+      pageWidth === this.lastLayoutPageWidth &&
+      fontSize === this.lastLayoutFontSize
+    ) {
+      return;
     }
+
+    const previousTileColCount = this.tileColCount;
+    this.tileColCount = tileColCount;
+    this.tileWidth = tileWidth;
+    this.lastLayoutPageWidth = pageWidth;
+    this.lastLayoutFontSize = fontSize;
+
+    const firstVisibleIndex = this.datasource.adapter.firstVisible.$index ?? 0;
+    const isTiled =
+      this.preferences[MyRecipesPreferenceKey.ViewType] === "tiles";
+    this.datasource.settings!.startIndex = isTiled
+      ? Math.floor((firstVisibleIndex * previousTileColCount) / tileColCount)
+      : firstVisibleIndex;
+    this.datasource.adapter.reset();
   };
 
   authorDisplay(author: DiscoverRecipeAuthor) {

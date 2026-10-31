@@ -16,6 +16,7 @@ import {
   OfflineModePromptOptions,
   PreferencesSync,
   RecipeDetailsPreferenceKey,
+  RecipeDetailsLayoutOptions,
   ShoppingListPreferenceKey,
   ShoppingListSortOptions,
   StartPageOptions,
@@ -29,6 +30,14 @@ import { TranslateService } from "@ngx-translate/core";
 import { EventName, EventService } from "./event.service";
 
 const PREFERENCE_LOCALSTORAGE_KEY = "preferences";
+
+const LOCAL_ONLY_PREFERENCE_KEYS: (keyof AppPreferenceTypes)[] = [
+  // We do not want to sync preferencesSync itself since that would cause issues with the user setting a local value to disable this feature
+  GlobalPreferenceKey.PreferencesSync,
+  // We do not want to sync viewtype because it's different per-device based on screen size
+  MyRecipesPreferenceKey.ViewType,
+  RecipeDetailsPreferenceKey.Layout,
+];
 
 @Injectable({
   providedIn: "root",
@@ -69,6 +78,7 @@ export class PreferencesService {
 
     [RecipeDetailsPreferenceKey.EnableWakeLock]: true,
     [RecipeDetailsPreferenceKey.AutoExpandNutrition]: false,
+    [RecipeDetailsPreferenceKey.Layout]: RecipeDetailsLayoutOptions.Automatic,
 
     [CookModePreferenceKey.FontSize]: SupportedFontSize.PX20,
 
@@ -98,6 +108,9 @@ export class PreferencesService {
     [ShoppingListPreferenceKey.IgnoreItemTitles]: "",
   };
 
+  private syncedPreferenceStrings: Record<string, string> = {};
+  private remoteSaveQueue: Promise<void> = Promise.resolve();
+
   constructor() {
     this.load();
   }
@@ -119,9 +132,49 @@ export class PreferencesService {
 
     // Do not sync remote preferences if not logged in
     if (!localStorage.getItem("token")) return;
-    this.serverActionsService.users.updatePreferences(this.preferences, {
-      "*": () => {},
-    });
+
+    this.remoteSaveQueue = this.remoteSaveQueue
+      .then(() => this.sendChangedPreferences())
+      .catch((e) => console.error(e));
+  }
+
+  saveAllToServer() {
+    this.syncedPreferenceStrings = {};
+    this.save();
+  }
+
+  private async sendChangedPreferences() {
+    const preferenceStrings = this.getPreferenceStrings();
+    const changedPreferences = Object.fromEntries(
+      Object.entries(this.preferences).filter(
+        ([key]) =>
+          !LOCAL_ONLY_PREFERENCE_KEYS.some(
+            (localOnlyKey) => localOnlyKey === key,
+          ) && preferenceStrings[key] !== this.syncedPreferenceStrings[key],
+      ),
+    );
+    if (!Object.keys(changedPreferences).length) return;
+
+    const response = await this.serverActionsService.users.updatePreferences(
+      changedPreferences,
+      {
+        "*": () => {},
+      },
+    );
+    if (!response) return;
+
+    for (const key of Object.keys(changedPreferences)) {
+      this.syncedPreferenceStrings[key] = preferenceStrings[key];
+    }
+  }
+
+  private getPreferenceStrings() {
+    return Object.fromEntries(
+      Object.entries(this.preferences).map(([key, value]) => [
+        key,
+        JSON.stringify(value),
+      ]),
+    );
   }
 
   /**
@@ -154,10 +207,9 @@ export class PreferencesService {
       ...preferences,
     } as Partial<AppPreferenceTypes>;
 
-    // We do not want to sync preferencesSync itself since that would cause issues with the user setting a local value to disable this feature
-    delete mutatedPreferences["global.preferencesSync"];
-    // We do not want to sync viewtype because it's different per-device based on screen size
-    delete mutatedPreferences["myRecipes.viewType"];
+    for (const key of LOCAL_ONLY_PREFERENCE_KEYS) {
+      delete mutatedPreferences[key];
+    }
 
     return mutatedPreferences;
   }
@@ -173,6 +225,8 @@ export class PreferencesService {
     } catch (e) {
       console.error(e);
     }
+
+    this.syncedPreferenceStrings = this.getPreferenceStrings();
 
     if (
       this.preferences[GlobalPreferenceKey.PreferencesSync] !==
@@ -196,6 +250,7 @@ export class PreferencesService {
           const previousTheme = this.preferences["global.theme"];
           const previousSplitPane = this.preferences["global.enableSplitPane"];
           Object.assign(this.preferences, filteredPreferences);
+          this.syncedPreferenceStrings = this.getPreferenceStrings();
 
           this.save(true);
 

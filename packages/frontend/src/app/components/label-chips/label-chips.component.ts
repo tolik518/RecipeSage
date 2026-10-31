@@ -1,4 +1,4 @@
-import { Component, Input } from "@angular/core";
+import { Component, Input, ChangeDetectionStrategy } from "@angular/core";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 
 /** Recipe labels as small chips: the first few, then "+N" */
@@ -7,6 +7,7 @@ import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
   selector: "label-chips",
   templateUrl: "./label-chips.component.html",
   styleUrls: ["./label-chips.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [...SHARED_UI_IMPORTS],
 })
 export class LabelChipsComponent {

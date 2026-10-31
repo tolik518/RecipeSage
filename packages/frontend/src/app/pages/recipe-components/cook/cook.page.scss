@@ -1,5 +1,10 @@
 @import "../../../../theme/shared-variables.scss";
 
+ion-title.ios {
+  position: static;
+  padding-inline: 8px;
+}
+
 // Cook mode is read from a distance: clear states (done / current step) and a
 // little colour for structure. Sizes are in em/rem, which follow the cook mode
 // font size preference.

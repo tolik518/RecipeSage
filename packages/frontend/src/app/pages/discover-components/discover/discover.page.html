@@ -1,7 +1,12 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="nav">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      @if (!showBack) {
+        <ion-menu-button></ion-menu-button>
+      }
+      @if (showBack) {
+        <ion-back-button [defaultHref]="defaultBackHref"></ion-back-button>
+      }
     </ion-buttons>
     <ion-title>{{ "pages.discover.title" | translate }}</ion-title>
     <ion-buttons slot="end">
@@ -12,10 +17,11 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <div class="discover-page">
+<ion-content [fullscreen]="true">
+  <div class="discover-page ion-content-scroll-host">
     <div class="search-container">
       <ion-searchbar
+        clearIcon="close-outline"
         class="searchbar"
         [value]="searchTerm"
         placeholder="{{ 'pages.discover.search.placeholder' | translate }}"
@@ -39,7 +45,11 @@
 
     @if (recipes.length && preferences[preferenceKeys.ViewType] === "tiles") {
       <div *uiScroll="let recipeGroup of datasource" class="recipe-group-row">
-        <div class="recipe-group" [class.single-col]="tileColCount === 1">
+        <div
+          class="recipe-group"
+          [class.single-col]="tileColCount === 1"
+          [style.--tile-width.px]="tileWidth"
+        >
           @for (recipe of recipeGroup; track recipe.id) {
             <div
               class="recipe-card"

@@ -1,5 +1,5 @@
-// Bottom sheet on phones: rows like a native action sheet instead of stacked
-// filled buttons; the destructive action stays red.
+// Bottom sheet on phones: rows like a native action sheet; the destructive
+// action stays red (colour set in the template).
 :host(.sheet) {
   overflow-y: auto;
   max-height: 85vh;
@@ -19,31 +19,16 @@
     color: var(--ion-color-medium);
   }
 
-  ion-button {
-    margin: 0 !important;
-    height: auto;
-    border-top: 1px solid var(--ion-border-color);
+  ion-item {
+    --min-height: 52px;
+    --background: transparent;
     font-size: 1rem;
     font-weight: 500;
-    text-transform: none;
-    letter-spacing: normal;
-
-    &::part(native) {
-      min-height: 52px;
-      background: transparent;
-      color: var(--ion-color-primary);
-      box-shadow: none;
-      border-radius: 0;
-    }
-  }
-
-  ion-button[color="danger"]::part(native) {
-    color: var(--ion-color-danger);
   }
 }
 
 // Popover on wider screens: a compact menu (icon + label rows, highlighted on
-// hover) instead of a column of filled buttons; the destructive action stays red.
+// hover); the destructive action stays red.
 :host(:not(.sheet)) {
   ion-list {
     padding: 6px 0;
@@ -59,62 +44,20 @@
     color: var(--ion-color-medium);
   }
 
-  // Toggle row lines up with the menu rows below it
   ion-item {
     --min-height: 40px;
     --padding-start: 16px;
+    --background-hover: var(--ion-text-color);
+    --background-hover-opacity: 0.06;
     font-size: 0.9rem;
 
     ion-icon[slot="start"] {
       margin-inline-end: 12px;
       font-size: 1.15rem;
+    }
+
+    ion-icon[slot="start"]:not([color]) {
       color: var(--ion-color-medium);
-    }
-  }
-
-  ion-button {
-    margin: 0 6px !important;
-    height: auto;
-    font-size: 0.9rem;
-    font-weight: 400;
-    text-transform: none;
-    letter-spacing: normal;
-
-    &::part(native) {
-      min-height: 38px;
-      padding: 0 10px;
-      justify-content: flex-start;
-      background: transparent;
-      color: var(--ion-text-color);
-      box-shadow: none;
-      border-radius: 8px;
-    }
-
-    &:hover::part(native) {
-      background: rgba(var(--ion-text-color-rgb, 0, 0, 0), 0.06);
-    }
-
-    // Label fills the row, so text starts right after the icon
-    .label {
-      flex: 1;
-      text-align: start;
-    }
-
-    ion-icon {
-      margin-inline-end: 12px;
-      font-size: 1.15rem;
-      color: var(--ion-color-medium);
-    }
-  }
-
-  ion-button[color="danger"] {
-    &::part(native),
-    ion-icon {
-      color: var(--ion-color-danger);
-    }
-
-    &:hover::part(native) {
-      background: rgba(var(--ion-color-danger-rgb), 0.08);
     }
   }
 }

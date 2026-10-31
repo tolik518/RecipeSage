@@ -1,11 +1,18 @@
-import { Input, Component, inject } from "@angular/core";
+import {
+  Input,
+  Component,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import dayjs from "dayjs";
-import { ModalController } from "@ionic/angular/standalone";
+import { ModalController } from "@ionic/angular";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { SelectMealComponent } from "../../../components/select-meal/select-meal.component";
 import { SelectRecipeComponent } from "../../../components/select-recipe/select-recipe.component";
 import { PreferencesService } from "../../../services/preferences.service";
 import { RecurrenceEditorComponent } from "../../../components/recurrence-editor/recurrence-editor.component";
+import { TextInputComponent } from "../../../components/forms/text-input/text-input.component";
+import { TextAreaComponent } from "../../../components/forms/text-area/text-area.component";
 import type { RecipeSummary } from "@recipesage/prisma";
 import {
   MEAL_PLAN_ITEMS_NOTES_LENGTH_LIMIT,
@@ -26,11 +33,11 @@ import {
   IonSegment,
   IonSegmentButton,
   IonItem,
-  IonInput,
   IonLabel,
-  IonTextarea,
+  IonList,
+  IonItemGroup,
   IonFooter,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { calendarOutline, closeOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -49,11 +56,14 @@ export interface MealPlanItemDraft {
   selector: "page-new-meal-plan-item-modal",
   templateUrl: "new-meal-plan-item-modal.page.html",
   styleUrls: ["new-meal-plan-item-modal.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     SelectMealComponent,
     SelectRecipeComponent,
     RecurrenceEditorComponent,
+    TextInputComponent,
+    TextAreaComponent,
     IonHeader,
     IonToolbar,
     IonTitle,
@@ -64,9 +74,9 @@ export interface MealPlanItemDraft {
     IonSegment,
     IonSegmentButton,
     IonItem,
-    IonInput,
     IonLabel,
-    IonTextarea,
+    IonList,
+    IonItemGroup,
     IonFooter,
   ],
 })

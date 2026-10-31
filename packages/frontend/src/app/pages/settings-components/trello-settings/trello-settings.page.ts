@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import {
   AlertController,
   ToastController,
@@ -10,7 +10,7 @@ import {
   IonContent,
   IonButton,
   IonIcon,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { checkboxOutline, openOutline, checkmarkCircleOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 import { TranslateService } from "@ngx-translate/core";
@@ -26,6 +26,7 @@ import { TextInputComponent } from "../../../components/forms/text-input/text-in
   selector: "page-trello-settings",
   templateUrl: "trello-settings.page.html",
   styleUrls: ["trello-settings.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     IonHeader,

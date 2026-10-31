@@ -95,6 +95,14 @@ export enum MealPlanViewTypeOptions {
   List = "list",
 }
 
+export enum RecipeDetailsLayoutOptions {
+  Automatic = "automatic",
+  Stacked = "stacked",
+  SideBySide = "sideBySide",
+  SideBySideEqualWidth = "sideBySideEqualWidth",
+  Tabs = "tabs",
+}
+
 export enum StartPageOptions {
   MyRecipes = "myRecipes",
   ManageLabels = "manageLabels",
@@ -140,6 +148,7 @@ export enum MyRecipesPreferenceKey {
 export enum RecipeDetailsPreferenceKey {
   EnableWakeLock = "recipeDetails.enableWakeLock",
   AutoExpandNutrition = "recipeDetails.autoExpandNutrition",
+  Layout = "recipeDetails.layout",
 }
 
 export enum CookModePreferenceKey {
@@ -196,6 +205,7 @@ export interface AppPreferenceTypes {
 
   [RecipeDetailsPreferenceKey.EnableWakeLock]: boolean;
   [RecipeDetailsPreferenceKey.AutoExpandNutrition]: boolean;
+  [RecipeDetailsPreferenceKey.Layout]: RecipeDetailsLayoutOptions;
 
   [CookModePreferenceKey.FontSize]: SupportedFontSize;
 

@@ -1,11 +1,11 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import {
   NavController,
   AlertController,
   ToastController,
   type AccordionGroupChangeEventDetail,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 import type { ImageSummary } from "@recipesage/prisma";
 
@@ -47,7 +47,7 @@ import {
   IonAccordion,
   IonAvatar,
   IonIcon,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { closeCircleOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -163,6 +163,7 @@ const emptyForm = (): PublishRecipeForm => ({
   selector: "page-publish-discover-recipe",
   templateUrl: "publish-discover-recipe.page.html",
   styleUrls: ["publish-discover-recipe.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     TextInputComponent,
@@ -209,6 +210,7 @@ export class PublishDiscoverRecipePage {
   defaultBackHref = RouteMap.DiscoverPage.getPath();
 
   saving = false;
+  imageUploading = false;
   agreedToTos = false;
   legalHref = RouteMap.LegalPage.getPath();
   nutritionAccordionValue: string | null = null;
@@ -663,6 +665,7 @@ export class PublishDiscoverRecipePage {
 
   canSubmit() {
     if (this.saving) return false;
+    if (this.imageUploading) return false;
     if (!this.form.title.trim()) return false;
     if (!this.isEditMode && !this.agreedToTos) return false;
     return true;

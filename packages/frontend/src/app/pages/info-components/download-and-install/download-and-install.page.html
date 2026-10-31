@@ -1,14 +1,19 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="nav">
     <ion-buttons slot="start">
-      <ion-menu-button></ion-menu-button>
+      @if (!showBack) {
+        <ion-menu-button></ion-menu-button>
+      }
+      @if (showBack) {
+        <ion-back-button [defaultHref]="defaultBackHref"></ion-back-button>
+      }
     </ion-buttons>
 
     <ion-title>{{ "pages.downloadAndInstall.title" | translate }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
   <div class="page-wrapper">
     @if (isNativeOrDesktopApp) {
       <p class="page-intro">
@@ -21,6 +26,7 @@
         "
         [webshareURL]="downloadPageUrl"
         [copyText]="downloadPageUrl"
+        [hideInstructions]="true"
       ></copy-with-webshare>
     } @else {
       <p class="page-intro">

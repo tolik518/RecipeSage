@@ -1,4 +1,11 @@
-import { Component, Input, Output, EventEmitter, inject } from "@angular/core";
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
 import { LoadingService } from "../../services/loading.service";
 import { SHARED_UI_IMPORTS } from "../../providers/shared-ui.provider";
 import { ServerActionsService } from "../../services/server-actions.service";
@@ -9,6 +16,8 @@ import type {
 } from "@recipesage/prisma";
 import { SEARCH_TERM_LENGTH_LIMIT } from "@recipesage/util/shared";
 import {
+  IonList,
+  IonItemGroup,
   IonItem,
   IonAvatar,
   IonLabel,
@@ -16,8 +25,8 @@ import {
   IonBadge,
   IonSpinner,
   IonIcon,
-} from "@ionic/angular/standalone";
-import { folderOpenOutline } from "ionicons/icons";
+} from "@ionic/angular";
+import { folderOpenOutline, closeOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
 @Component({
@@ -25,8 +34,11 @@ import { addIcons } from "ionicons";
   selector: "select-recipe",
   templateUrl: "select-recipe.component.html",
   styleUrls: ["./select-recipe.component.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
+    IonList,
+    IonItemGroup,
     IonItem,
     IonAvatar,
     IonLabel,
@@ -74,7 +86,7 @@ export class SelectRecipeComponent {
   recipes: RecipeSummaryLite[] = [];
 
   constructor() {
-    addIcons({ folderOpenOutline });
+    addIcons({ folderOpenOutline, closeOutline });
     this.fetchFriends();
   }
 

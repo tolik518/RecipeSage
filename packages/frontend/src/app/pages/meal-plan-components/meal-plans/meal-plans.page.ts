@@ -1,5 +1,10 @@
-import { Component, computed, inject } from "@angular/core";
-import { NavController, ModalController } from "@ionic/angular/standalone";
+import {
+  Component,
+  computed,
+  inject,
+  ChangeDetectionStrategy,
+} from "@angular/core";
+import { NavController, ModalController } from "@ionic/angular";
 
 import { WebsocketService } from "../../../services/websocket.service";
 import { LoadingService } from "../../../services/loading.service";
@@ -7,6 +12,7 @@ import { UtilService, RouteMap } from "../../../services/util.service";
 import { NewMealPlanModalPage } from "../new-meal-plan-modal/new-meal-plan-modal.page";
 import { ServerActionsService } from "../../../services/server-actions.service";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import { NullStateComponent } from "../../../components/null-state/null-state.component";
 import {
   IonHeader,
@@ -17,13 +23,14 @@ import {
   IonTitle,
   IonContent,
   IonList,
+  IonItemGroup,
   IonItem,
   IonIcon,
   IonLabel,
   IonFab,
   IonFabButton,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { addOutline, calendarOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -32,6 +39,7 @@ import { addIcons } from "ionicons";
   selector: "page-meal-plans",
   templateUrl: "meal-plans.page.html",
   styleUrls: ["meal-plans.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,
@@ -43,6 +51,7 @@ import { addIcons } from "ionicons";
     IonTitle,
     IonContent,
     IonList,
+    IonItemGroup,
     IonItem,
     IonIcon,
     IonLabel,
@@ -62,6 +71,8 @@ export class MealPlansPage {
   private websocketService = inject(WebsocketService);
   private loadingService = inject(LoadingService);
   private utilService = inject(UtilService);
+
+  isNativeIOS = IS_NATIVE_IOS;
 
   private meQuery = this.serverActionsService.users.getMe();
   me = this.meQuery.value;

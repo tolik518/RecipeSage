@@ -1,9 +1,10 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
+import { Router } from "@angular/router";
 import {
   NavController,
   ToastController,
   ModalController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 
 import type { MessageThreadDTO } from "@recipesage/prisma";
 import { MessagingService } from "../../../services/messaging.service";
@@ -14,11 +15,14 @@ import { EventService } from "../../../services/event.service";
 import { UtilService, RouteMap } from "../../../services/util.service";
 import { NewMessageModalPage } from "../new-message-modal/new-message-modal.page";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
+import { IS_NATIVE_IOS } from "../../../utils/isNativeIOS";
 import { NullStateComponent } from "../../../components/null-state/null-state.component";
 import {
   IonHeader,
   IonToolbar,
   IonButtons,
+  IonButton,
+  IonBackButton,
   IonMenuButton,
   IonTitle,
   IonContent,
@@ -30,7 +34,7 @@ import {
   IonFabButton,
   IonFooter,
   IonSpinner,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { addOutline, chatboxOutline } from "ionicons/icons";
 import { addIcons } from "ionicons";
 
@@ -39,12 +43,15 @@ import { addIcons } from "ionicons";
   selector: "page-messages",
   templateUrl: "messages.page.html",
   styleUrls: ["messages.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     NullStateComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
+    IonButton,
+    IonBackButton,
     IonMenuButton,
     IonTitle,
     IonContent,
@@ -60,6 +67,7 @@ import { addIcons } from "ionicons";
 })
 export class MessagesPage {
   navCtrl = inject(NavController);
+  router = inject(Router);
   events = inject(EventService);
   toastCtrl = inject(ToastController);
   modalCtrl = inject(ModalController);
@@ -69,6 +77,11 @@ export class MessagesPage {
   messagingService = inject(MessagingService);
   serverActionsService = inject(ServerActionsService);
 
+  isNativeIOS = IS_NATIVE_IOS;
+
+  showBack = false;
+  defaultBackHref: string = RouteMap.PeoplePage.getPath();
+
   loading = true;
 
   threads: MessageThreadDTO[] = [];
@@ -76,6 +89,10 @@ export class MessagesPage {
   constructor() {
     addIcons({ addOutline, chatboxOutline });
     this.messagingService.requestNotifications();
+
+    if (this.router.currentNavigation()?.extras.state?.showBack) {
+      this.showBack = true;
+    }
   }
 
   ionViewWillEnter() {

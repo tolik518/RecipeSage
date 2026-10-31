@@ -1,4 +1,4 @@
-import { Component, inject } from "@angular/core";
+import { Component, inject, ChangeDetectionStrategy } from "@angular/core";
 import { ActivatedRoute } from "@angular/router";
 import { Title } from "@angular/platform-browser";
 import {
@@ -7,7 +7,7 @@ import {
   ToastController,
   ModalController,
   PopoverController,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import { TranslateService } from "@ngx-translate/core";
 
 import { RouteMap, UtilService } from "../../../services/util.service";
@@ -48,6 +48,7 @@ import { linkifyHtml } from "../../../utils/linkify";
 import { getShareLinkOrigin } from "../../../utils/serverConfig";
 import { SHARED_UI_IMPORTS } from "../../../providers/shared-ui.provider";
 import { RatingComponent } from "../../../components/rating/rating.component";
+import { IngredientsInstructionsLayoutComponent } from "../../../components/ingredients-instructions-layout/ingredients-instructions-layout.component";
 import {
   IonHeader,
   IonToolbar,
@@ -65,7 +66,7 @@ import {
   IonButton,
   IonChip,
   IonAvatar,
-} from "@ionic/angular/standalone";
+} from "@ionic/angular";
 import {
   bookOutline,
   bookmarkOutline,
@@ -86,9 +87,11 @@ type DiscoverRecipeDetail = RouterOutputs["discover"]["getDiscoverRecipe"];
   selector: "page-discover-recipe",
   templateUrl: "discover-recipe.page.html",
   styleUrls: ["discover-recipe.page.scss"],
+  changeDetection: ChangeDetectionStrategy.Eager,
   imports: [
     ...SHARED_UI_IMPORTS,
     RatingComponent,
+    IngredientsInstructionsLayoutComponent,
     IonHeader,
     IonToolbar,
     IonButtons,
@@ -605,6 +608,7 @@ export class DiscoverRecipePage {
 
     const imageViewerModal = await this.modalCtrl.create({
       component: ImageViewerComponent,
+      cssClass: "imageViewerModal",
       componentProps: {
         imageUrls: this.recipe.discoverRecipeImages.map(
           (discoverRecipeImage) => discoverRecipeImage.image.location,
