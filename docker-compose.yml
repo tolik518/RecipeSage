@@ -167,6 +167,7 @@ services:
       args:
         BASE: julianpoy/grocery-categorizer:f9d9562
         RUN_AS: appuser
+        PY_UPGRADE: "anyio certifi"
     mem_limit: 1g
     restart: unless-stopped
 
