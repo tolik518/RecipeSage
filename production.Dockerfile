@@ -1,5 +1,8 @@
 FROM node:24.22-alpine
 
+# Alpine fixes the node tag has not picked up yet (zlib 1.4-r0 for CVE-2026-4738, openssl).
+RUN apk upgrade --no-cache
+
 WORKDIR /app
 
 # prisma
